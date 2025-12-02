@@ -1,11 +1,11 @@
-# Daily Expense Tracker - Project Plan
+# daily-expense-tracker - Project Plan
 
 ## Implementation Timeline
 
 ### Phase 1: Foundation & Setup (Week 1)
 **Goal:** Basic project structure and core functionality
 
-- [ ] **Project structure & environment**
+- [✅] **Project structure & environment**
   - Create folder structure
   - Set up virtual environment
   - Install dependencies

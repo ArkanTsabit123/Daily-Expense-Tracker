@@ -1,11 +1,11 @@
-#project portofolio\junior projects\Daily Expense Tracker\generate\structure.py
+#project portofolio\junior projects\daily-expense-tracker\generate\structure.py
 
 """
-View Daily Expense Tracker - Project Structure
+View daily-expense-tracker - Project Structure
 """
 
 def show_structure():
-    print("Daily Expense Tracker - Project Structure")
+    print("daily-expense-tracker - Project Structure")
     print("=" * 60)
 
     structure = """

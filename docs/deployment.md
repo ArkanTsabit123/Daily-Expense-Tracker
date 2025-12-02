@@ -1,4 +1,4 @@
-# Daily Expense Tracker - Deployment Guide
+# daily-expense-tracker - Deployment Guide
 
 ## Deployment Options
 
@@ -26,8 +26,8 @@ pyinstaller --onefile --name="DailyExpenseTracker" main.py
 #### macOS (.app bundle)
 ```bash
 # Create macOS application
-pyinstaller --windowed --name="Daily Expense Tracker" main.py
-# Output: dist/Daily Expense Tracker.app
+pyinstaller --windowed --name="daily-expense-tracker" main.py
+# Output: dist/daily-expense-tracker.app
 ```
 
 #### Linux
@@ -74,7 +74,7 @@ DailyExpenseTracker-v1.0.0/
 ### Windows Installation Script (install.bat)
 ```batch
 @echo off
-echo Installing Daily Expense Tracker...
+echo Installing daily-expense-tracker...
 echo.
 
 REM Check Python installation
@@ -114,7 +114,7 @@ pause
 ### Mac/Linux Installation Script (install.sh)
 ```bash
 #!/bin/bash
-echo "Installing Daily Expense Tracker..."
+echo "Installing daily-expense-tracker..."
 
 # Check Python 3 installation
 if ! command -v python3 &> /dev/null; then
@@ -216,10 +216,10 @@ expense-tracker
 2. Create `setup.iss` script:
 ```iss
 [Setup]
-AppName=Daily Expense Tracker
+AppName=daily-expense-tracker
 AppVersion=1.0.0
-DefaultDirName={pf}\Daily Expense Tracker
-DefaultGroupName=Daily Expense Tracker
+DefaultDirName={pf}\daily-expense-tracker
+DefaultGroupName=daily-expense-tracker
 OutputDir=installer
 OutputBaseFilename=DailyExpenseTrackerSetup
 Compression=lzma
@@ -232,8 +232,8 @@ Source: "README.txt"; DestDir: "{app}"
 Source: "data\*"; DestDir: "{app}\data"; Flags: recursesubdirs createallsubdirs
 
 [Icons]
-Name: "{group}\Daily Expense Tracker"; Filename: "{app}\DailyExpenseTracker.exe"
-Name: "{commondesktop}\Daily Expense Tracker"; Filename: "{app}\DailyExpenseTracker.exe"
+Name: "{group}\daily-expense-tracker"; Filename: "{app}\DailyExpenseTracker.exe"
+Name: "{commondesktop}\daily-expense-tracker"; Filename: "{app}\DailyExpenseTracker.exe"
 ```
 
 3. Compile with ISCC.exe
@@ -332,8 +332,8 @@ import streamlit as st
 import pandas as pd
 from datetime import datetime
 
-st.set_page_config(page_title="Daily Expense Tracker", layout="wide")
-st.title("Daily Expense Tracker - Web Version")
+st.set_page_config(page_title="daily-expense-tracker", layout="wide")
+st.title("daily-expense-tracker - Web Version")
 
 # Add web interface code here
 ```
@@ -352,7 +352,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import List
 
-app = FastAPI(title="Daily Expense Tracker API")
+app = FastAPI(title="daily-expense-tracker API")
 
 app.add_middleware(
     CORSMiddleware,
@@ -369,7 +369,7 @@ class Expense(BaseModel):
 
 @app.get("/")
 async def root():
-    return {"message": "Daily Expense Tracker API"}
+    return {"message": "daily-expense-tracker API"}
 
 @app.get("/expenses/")
 async def get_expenses():

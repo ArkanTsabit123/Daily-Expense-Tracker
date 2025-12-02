@@ -1,4 +1,4 @@
-# Daily Expense Tracker - Development Cheatsheet
+# daily-expense-tracker - Development Cheatsheet
 
 ## Project Setup
 

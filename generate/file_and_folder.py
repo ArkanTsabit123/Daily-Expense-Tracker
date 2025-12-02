@@ -1,14 +1,14 @@
-#project portofolio\junior projects\Daily Expense Tracker\generate\file_and_folder.py
+#project portofolio\junior projects\daily-expense-tracker\generate\file_and_folder.py
 
 
 """
-File Structure Generator for Daily Expense Tracker
+File Structure Generator for daily-expense-tracker
 """
 
 from pathlib import Path
 
 def main():
-    print("Creating Daily Expense Tracker file and folder structure...\n")
+    print("Creating daily-expense-tracker file and folder structure...\n")
     
     # Project folder
     project = Path("daily-expense-tracker")
