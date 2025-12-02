@@ -1,6 +1,6 @@
 # Daily Expense Tracker
 
-A comprehensive Python application for tracking and analyzing daily expenses with data visualization and reporting capabilities. Built with modular architecture following professional software design patterns.
+A useful Python application for tracking and analyzing daily expenses with data visualization and reporting capabilities. Built with modular architecture following professional software design patterns.
 
 ## Features
 
@@ -19,12 +19,12 @@ A comprehensive Python application for tracking and analyzing daily expenses wit
 ### Export & Reporting
 - Export to CSV with proper encoding
 - Export to Excel with professional formatting
-- Generate comprehensive reports with multiple sheets
+- Generate useful reports with multiple sheets
 - Automatic file management with organized exports
 
 ### Advanced Functionality
 - Smart filtering by date range, category, and amount
-- Input validation with comprehensive error handling
+- Input validation with useful error handling
 - Currency formatting for Indonesian Rupiah (IDR)
 - Date utilities with Indonesian month names
 
@@ -163,7 +163,7 @@ Please select an option:
 - View total expenses for any month
 - See category breakdown with percentages
 - Generate pie chart visualization
-- Export comprehensive monthly report
+- Export useful monthly report
 
 ## Development
 
@@ -207,7 +207,7 @@ isort .
 ### Core Programming
 - Object-Oriented Programming with clean class structure
 - Data Modeling with dataclasses and proper validation
-- Comprehensive Error Handling with try-catch blocks
+- useful Error Handling with try-catch blocks
 - Type Hints for better code maintainability
 
 ### Database Management

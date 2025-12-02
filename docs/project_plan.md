@@ -71,7 +71,7 @@
   - Date formatting
   - Data export formatting
 
-- [ ] **Comprehensive input validation**
+- [ ] **useful input validation**
   - Date validation
   - Amount validation
   - Category validation
@@ -84,7 +84,7 @@
   - Excel export with formatting
   - Report generation
 
-- [ ] **Comprehensive reporting**
+- [ ] **useful reporting**
   - Monthly reports
   - Category reports
   - Custom date range reports
@@ -107,7 +107,7 @@
   - Documentation improvements
   - Remove unused code
 
-- [ ] **Comprehensive documentation**
+- [ ] **useful documentation**
   - User documentation
   - Developer documentation
   - API documentation (if applicable)
@@ -132,7 +132,7 @@
 
 ### Complete Version
 - [ ] All CRUD operations with validation
-- [ ] Comprehensive reporting
+- [ ] useful reporting
 - [ ] Excel export with formatting
 - [ ] Advanced visualization
 - [ ] Full test coverage
