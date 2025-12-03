@@ -54,10 +54,12 @@ class DatabaseConfig:
                 conn.close()
     
     def initialize_database(self) -> bool:
+        """Initialize database with tables and indexes"""
         try:
             conn = self.get_connection()
             cursor = conn.cursor()
             
+            # Create expenses table
             cursor.execute('''
                 CREATE TABLE IF NOT EXISTS expenses (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -70,6 +72,7 @@ class DatabaseConfig:
                 )
             ''')
             
+            # Create categories table
             cursor.execute('''
                 CREATE TABLE IF NOT EXISTS categories (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -80,9 +83,23 @@ class DatabaseConfig:
                 )
             ''')
             
-            cursor.execute('CREATE INDEX IF NOT EXISTS idx_expenses_date ON expenses(date)')
-            cursor.execute('CREATE INDEX IF NOT EXISTS idx_expenses_category ON expenses(category)')
+            # Create indexes for performance
+            cursor.execute('''
+                CREATE INDEX IF NOT EXISTS idx_expenses_date 
+                ON expenses(date)
+            ''')
             
+            cursor.execute('''
+                CREATE INDEX IF NOT EXISTS idx_expenses_category 
+                ON expenses(category)
+            ''')
+            
+            cursor.execute('''
+                CREATE INDEX IF NOT EXISTS idx_expenses_date_category 
+                ON expenses(date, category)
+            ''')
+            
+            # Insert default categories
             default_categories = [
                 ('Makanan & Minuman', 0, 'Pengeluaran untuk makanan dan minuman'),
                 ('Transportasi', 0, 'Biaya transportasi'),
@@ -110,7 +127,30 @@ class DatabaseConfig:
             logger.error(f"Database initialization error: {e}")
             return False
     
+    def optimize_database(self):
+        """Optimize database performance"""
+        try:
+            conn = self.get_connection()
+            cursor = conn.cursor()
+            
+            # Create additional indexes if needed
+            cursor.execute('CREATE INDEX IF NOT EXISTS idx_expenses_amount ON expenses(amount)')
+            cursor.execute('CREATE INDEX IF NOT EXISTS idx_categories_name ON categories(name)')
+            
+            # Analyze tables for query optimization
+            cursor.execute('ANALYZE')
+            
+            conn.commit()
+            conn.close()
+            logger.info("Database optimized with indexes")
+            return True
+            
+        except sqlite3.Error as e:
+            logger.error(f"Database optimization error: {e}")
+            return False
+    
     def backup_database(self, backup_name: str = None) -> bool:
+        """Create a backup of the database"""
         if not self.db_path.exists():
             logger.warning("Database file does not exist")
             return False
@@ -130,11 +170,13 @@ class DatabaseConfig:
             return False
     
     def get_database_info(self) -> dict:
+        """Get information about the database"""
         info = {
             'path': str(self.db_path),
             'exists': self.db_path.exists(),
             'size_bytes': 0,
-            'tables': []
+            'tables': [],
+            'indexes': []
         }
         
         if self.db_path.exists():
@@ -144,10 +186,17 @@ class DatabaseConfig:
                 conn = self.get_connection()
                 cursor = conn.cursor()
                 
+                # Get tables
                 cursor.execute("SELECT name FROM sqlite_master WHERE type='table'")
                 tables = cursor.fetchall()
                 info['tables'] = [table['name'] for table in tables]
                 
+                # Get indexes
+                cursor.execute("SELECT name FROM sqlite_master WHERE type='index' AND name NOT LIKE 'sqlite_%'")
+                indexes = cursor.fetchall()
+                info['indexes'] = [index['name'] for index in indexes]
+                
+                # Get row counts
                 for table in info['tables']:
                     cursor.execute(f"SELECT COUNT(*) as count FROM {table}")
                     count = cursor.fetchone()['count']
@@ -162,6 +211,7 @@ class DatabaseConfig:
 
 
 def test_database():
+    """Test function for database configuration"""
     print("Testing database configuration...")
     
     db_config = DatabaseConfig("test_expenses.db")
@@ -187,13 +237,17 @@ def test_database():
         print(f"Connection test failed: {e}")
     
     info = db_config.get_database_info()
-    print(f"Database Information:")
+    print(f"\nDatabase Information:")
     print(f"  Path: {info['path']}")
     print(f"  Size: {info['size_bytes'] / 1024:.2f} KB")
     print(f"  Tables: {', '.join(info['tables'])}")
+    print(f"  Indexes: {', '.join(info['indexes'])}")
     
     if db_config.backup_database():
-        print("Backup created successfully")
+        print("\nBackup created successfully")
+    
+    if db_config.optimize_database():
+        print("Database optimized successfully")
 
 
 if __name__ == "__main__":

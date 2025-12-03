@@ -35,6 +35,29 @@ class DatabaseService:
         self.db_config = DatabaseConfig()
     
     def add_expense(self, expense: Expense) -> int:
+
+    def add_batch_expenses(self, expenses: List[Expense]) -> List[int]:
+        """Add multiple expenses in batch"""
+        conn = self.db_config.get_connection()
+        cursor = conn.cursor()
+        expense_ids = []
+        
+        try:
+            for expense in expenses:
+                cursor.execute('''
+                    INSERT INTO expenses (date, category, amount, description)
+                    VALUES (?, ?, ?, ?)
+                ''', (expense.date, expense.category, float(expense.amount), expense.description))
+                expense_ids.append(cursor.lastrowid)
+            
+            conn.commit()
+        except Exception as e:
+            conn.rollback()
+            raise e
+        finally:
+            conn.close()
+        
+        return expense_ids
         """Add new expense to database"""
         try:
             conn = self.db_config.get_connection()
