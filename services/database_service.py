@@ -29,11 +29,13 @@ except ImportError:
 
 logger = logging.getLogger(__name__)
 
+
 class DatabaseService:
     def __init__(self):
         self.db_config = DatabaseConfig()
     
     def add_expense(self, expense: Expense) -> int:
+        """Add new expense to database"""
         try:
             conn = self.db_config.get_connection()
             cursor = conn.cursor()
@@ -60,6 +62,7 @@ class DatabaseService:
             raise
     
     def get_expense(self, expense_id: int):
+        """Get expense by ID"""
         try:
             conn = self.db_config.get_connection()
             cursor = conn.cursor()
@@ -77,6 +80,7 @@ class DatabaseService:
             return None
     
     def get_all_expenses(self, limit=None, offset=None):
+        """Get all expenses with optional pagination"""
         try:
             conn = self.db_config.get_connection()
             cursor = conn.cursor()
@@ -98,7 +102,40 @@ class DatabaseService:
             logger.error(f"Error getting all expenses: {e}")
             return []
     
+    def get_expenses(self, month: int = None, year: int = None, category: str = None):
+        """Get expenses with optional filters"""
+        try:
+            conn = self.db_config.get_connection()
+            cursor = conn.cursor()
+            
+            query = "SELECT * FROM expenses WHERE 1=1"
+            params = []
+            
+            if month and year:
+                query += " AND strftime('%Y', date) = ? AND strftime('%m', date) = ?"
+                params.extend([str(year), f"{month:02d}"])
+            elif year:
+                query += " AND strftime('%Y', date) = ?"
+                params.append(str(year))
+                
+            if category:
+                query += " AND category = ?"
+                params.append(category)
+                
+            query += " ORDER BY date DESC, created_at DESC"
+            
+            cursor.execute(query, params)
+            expenses = [dict(row) for row in cursor.fetchall()]
+            conn.close()
+            
+            return expenses
+            
+        except sqlite3.Error as e:
+            logger.error(f"Error getting filtered expenses: {e}")
+            return []
+    
     def get_expenses_by_date_range(self, start_date: date, end_date: date):
+        """Get expenses within date range"""
         try:
             conn = self.db_config.get_connection()
             cursor = conn.cursor()
@@ -119,6 +156,7 @@ class DatabaseService:
             return []
     
     def get_expenses_by_category(self, category: str):
+        """Get expenses by category"""
         try:
             conn = self.db_config.get_connection()
             cursor = conn.cursor()
@@ -139,6 +177,7 @@ class DatabaseService:
             return []
     
     def get_expenses_by_month(self, year: int, month: int):
+        """Get expenses by month"""
         try:
             conn = self.db_config.get_connection()
             cursor = conn.cursor()
@@ -159,6 +198,7 @@ class DatabaseService:
             return []
     
     def update_expense(self, expense_id: int, expense: Expense):
+        """Update existing expense"""
         try:
             conn = self.db_config.get_connection()
             cursor = conn.cursor()
@@ -192,6 +232,7 @@ class DatabaseService:
             return False
     
     def delete_expense(self, expense_id: int):
+        """Delete expense"""
         try:
             conn = self.db_config.get_connection()
             cursor = conn.cursor()
@@ -215,6 +256,7 @@ class DatabaseService:
             return False
     
     def get_all_categories(self):
+        """Get all categories"""
         try:
             conn = self.db_config.get_connection()
             cursor = conn.cursor()
@@ -229,7 +271,12 @@ class DatabaseService:
             logger.error(f"Error getting categories: {e}")
             return []
     
+    def get_categories(self):
+        """Get all categories (alias for get_all_categories)"""
+        return self.get_all_categories()
+    
     def add_category(self, category: Category) -> int:
+        """Add new category"""
         try:
             conn = self.db_config.get_connection()
             cursor = conn.cursor()
@@ -255,6 +302,7 @@ class DatabaseService:
             raise
     
     def get_monthly_summary(self, year: int, month: int):
+        """Get monthly expense summary"""
         try:
             conn = self.db_config.get_connection()
             cursor = conn.cursor()
@@ -311,6 +359,7 @@ class DatabaseService:
             }
     
     def get_category_summary(self, category: str):
+        """Get summary for specific category"""
         try:
             conn = self.db_config.get_connection()
             cursor = conn.cursor()
@@ -358,6 +407,7 @@ class DatabaseService:
             }
     
     def get_yearly_summary(self, year: int):
+        """Get yearly expense summary"""
         try:
             conn = self.db_config.get_connection()
             cursor = conn.cursor()
@@ -415,7 +465,9 @@ class DatabaseService:
                 'category_breakdown': []
             }
 
+
 def test_database_service():
+    """Test database service functionality"""
     print("Testing Database Service...")
     
     service = DatabaseService()
@@ -462,6 +514,7 @@ def test_database_service():
         print(f"   Error during test: {e}")
     
     print("\nDatabase service test completed!")
+
 
 if __name__ == "__main__":
     test_database_service()

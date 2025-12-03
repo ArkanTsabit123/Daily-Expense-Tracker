@@ -1,3 +1,9 @@
+#Github\project portofolio\junior project\daily-expense-tracker\models\expense_model.py
+
+"""
+Expense Model for Daily Expense Tracker.
+"""
+
 from dataclasses import dataclass
 from datetime import date
 from decimal import Decimal

@@ -1,4 +1,4 @@
-##Github\project portofolio\junior project\daily-expense-tracker\models\__init_.py
+#Github\project portofolio\junior project\daily-expense-tracker\models\__init_.py
 
 
 """

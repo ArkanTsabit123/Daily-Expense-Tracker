@@ -18,6 +18,7 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
+
 class DatabaseConfig:
     def __init__(self, db_name: str = "expenses.db"):
         self.project_root = Path(__file__).parent.parent
@@ -27,8 +28,19 @@ class DatabaseConfig:
         self.data_dir.mkdir(exist_ok=True)
         logger.info(f"Database path: {self.db_path}")
     
-    @contextmanager
     def get_connection(self) -> sqlite3.Connection:
+        """Create and return a database connection"""
+        try:
+            conn = sqlite3.connect(self.db_path)
+            conn.row_factory = sqlite3.Row
+            return conn
+        except sqlite3.Error as e:
+            logger.error(f"Database connection error: {e}")
+            raise
+    
+    @contextmanager
+    def get_connection_context(self):
+        """Context manager version for use with 'with' statement"""
         conn = None
         try:
             conn = sqlite3.connect(self.db_path)
@@ -43,56 +55,57 @@ class DatabaseConfig:
     
     def initialize_database(self) -> bool:
         try:
-            with self.get_connection() as conn:
-                cursor = conn.cursor()
-                
-                cursor.execute('''
-                    CREATE TABLE IF NOT EXISTS expenses (
-                        id INTEGER PRIMARY KEY AUTOINCREMENT,
-                        date DATE NOT NULL,
-                        category VARCHAR(50) NOT NULL,
-                        amount DECIMAL(10,2) NOT NULL CHECK (amount >= 0),
-                        description TEXT,
-                        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-                    )
-                ''')
-                
-                cursor.execute('''
-                    CREATE TABLE IF NOT EXISTS categories (
-                        id INTEGER PRIMARY KEY AUTOINCREMENT,
-                        name VARCHAR(50) UNIQUE NOT NULL,
-                        budget_limit DECIMAL(10,2) DEFAULT NULL CHECK (budget_limit >= 0),
-                        description TEXT,
-                        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-                    )
-                ''')
-                
-                cursor.execute('CREATE INDEX IF NOT EXISTS idx_expenses_date ON expenses(date)')
-                cursor.execute('CREATE INDEX IF NOT EXISTS idx_expenses_category ON expenses(category)')
-                
-                default_categories = [
-                    ('Makanan & Minuman', 0, 'Pengeluaran untuk makanan dan minuman'),
-                    ('Transportasi', 0, 'Biaya transportasi'),
-                    ('Belanja', 0, 'Belanja kebutuhan sehari-hari'),
-                    ('Hiburan', 0, 'Pengeluaran hiburan dan rekreasi'),
-                    ('Kesehatan', 0, 'Biaya kesehatan dan obat-obatan'),
-                    ('Pendidikan', 0, 'Biaya pendidikan dan kursus'),
-                    ('Tagihan', 0, 'Pembayaran tagihan rutin'),
-                    ('Lain-lain', 0, 'Pengeluaran lainnya')
-                ]
-                
-                for category in default_categories:
-                    cursor.execute(
-                        '''INSERT OR IGNORE INTO categories (name, budget_limit, description) 
-                           VALUES (?, ?, ?)''',
-                        category
-                    )
-                
-                conn.commit()
-                logger.info("Database initialized successfully")
-                return True
-                
+            conn = self.get_connection()
+            cursor = conn.cursor()
+            
+            cursor.execute('''
+                CREATE TABLE IF NOT EXISTS expenses (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    date DATE NOT NULL,
+                    category VARCHAR(50) NOT NULL,
+                    amount DECIMAL(10,2) NOT NULL CHECK (amount >= 0),
+                    description TEXT,
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                )
+            ''')
+            
+            cursor.execute('''
+                CREATE TABLE IF NOT EXISTS categories (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    name VARCHAR(50) UNIQUE NOT NULL,
+                    budget_limit DECIMAL(10,2) DEFAULT NULL CHECK (budget_limit >= 0),
+                    description TEXT,
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                )
+            ''')
+            
+            cursor.execute('CREATE INDEX IF NOT EXISTS idx_expenses_date ON expenses(date)')
+            cursor.execute('CREATE INDEX IF NOT EXISTS idx_expenses_category ON expenses(category)')
+            
+            default_categories = [
+                ('Makanan & Minuman', 0, 'Pengeluaran untuk makanan dan minuman'),
+                ('Transportasi', 0, 'Biaya transportasi'),
+                ('Belanja', 0, 'Belanja kebutuhan sehari-hari'),
+                ('Hiburan', 0, 'Pengeluaran hiburan dan rekreasi'),
+                ('Kesehatan', 0, 'Biaya kesehatan dan obat-obatan'),
+                ('Pendidikan', 0, 'Biaya pendidikan dan kursus'),
+                ('Tagihan', 0, 'Pembayaran tagihan rutin'),
+                ('Lain-lain', 0, 'Pengeluaran lainnya')
+            ]
+            
+            for category in default_categories:
+                cursor.execute(
+                    '''INSERT OR IGNORE INTO categories (name, budget_limit, description) 
+                       VALUES (?, ?, ?)''',
+                    category
+                )
+            
+            conn.commit()
+            conn.close()
+            logger.info("Database initialized successfully")
+            return True
+            
         except sqlite3.Error as e:
             logger.error(f"Database initialization error: {e}")
             return False
@@ -128,22 +141,25 @@ class DatabaseConfig:
             info['size_bytes'] = self.db_path.stat().st_size
             
             try:
-                with self.get_connection() as conn:
-                    cursor = conn.cursor()
+                conn = self.get_connection()
+                cursor = conn.cursor()
+                
+                cursor.execute("SELECT name FROM sqlite_master WHERE type='table'")
+                tables = cursor.fetchall()
+                info['tables'] = [table['name'] for table in tables]
+                
+                for table in info['tables']:
+                    cursor.execute(f"SELECT COUNT(*) as count FROM {table}")
+                    count = cursor.fetchone()['count']
+                    info[f'{table}_count'] = count
+                
+                conn.close()
                     
-                    cursor.execute("SELECT name FROM sqlite_master WHERE type='table'")
-                    tables = cursor.fetchall()
-                    info['tables'] = [table['name'] for table in tables]
-                    
-                    for table in info['tables']:
-                        cursor.execute(f"SELECT COUNT(*) as count FROM {table}")
-                        count = cursor.fetchone()['count']
-                        info[f'{table}_count'] = count
-                        
             except sqlite3.Error as e:
                 logger.error(f"Error getting database info: {e}")
         
         return info
+
 
 def test_database():
     print("Testing database configuration...")
@@ -157,15 +173,16 @@ def test_database():
         return
     
     try:
-        with db_config.get_connection() as conn:
-            cursor = conn.cursor()
-            cursor.execute("SELECT name FROM sqlite_master WHERE type='table'")
-            tables = cursor.fetchall()
-            print(f"Found {len(tables)} tables")
+        conn = db_config.get_connection()
+        cursor = conn.cursor()
+        cursor.execute("SELECT name FROM sqlite_master WHERE type='table'")
+        tables = cursor.fetchall()
+        conn.close()
+        print(f"Found {len(tables)} tables")
+        
+        for table in tables:
+            print(f"  - {table['name']}")
             
-            for table in tables:
-                print(f"  - {table['name']}")
-                
     except Exception as e:
         print(f"Connection test failed: {e}")
     
@@ -177,6 +194,7 @@ def test_database():
     
     if db_config.backup_database():
         print("Backup created successfully")
+
 
 if __name__ == "__main__":
     test_database()

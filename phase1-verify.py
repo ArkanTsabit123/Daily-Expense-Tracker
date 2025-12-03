@@ -11,24 +11,36 @@ import sqlite3
 from pathlib import Path
 
 def print_header(text):
-    print("\n" + "=" * 60)
-    print(f" {text}".center(60))
-    print("=" * 60)
+    print("\n" + "=" * 70)
+    print(f" {text}".center(70))
+    print("=" * 70)
+
+def check_item(name, passed, message=""):
+    if passed:
+        status = "✅ PASS"
+        symbol = "✅"
+    else:
+        status = "❌ FAIL"
+        symbol = "❌"
+    
+    print(f"{symbol} {name:40} {status}")
+    if message:
+        print(f"   {message}")
 
 def check_phase1():
-    print_header("PHASE 1 STATUS CHECK")
+    print_header("DAILY EXPENSE TRACKER - PHASE 1 VERIFICATION")
     
     project_root = Path(__file__).parent
+    print(f"Project location: {project_root}\n")
     
-    print("Project location:", project_root)
-    print()
+    print_header("DATABASE CHECK")
     
-    # Database check
-    print("1. DATABASE CHECK")
+    # Database file
     db_path = project_root / "data" / "expenses.db"
+    db_exists = db_path.exists()
+    check_item("Database file exists", db_exists)
     
-    if db_path.exists():
-        print("   Database file exists")
+    if db_exists:
         try:
             conn = sqlite3.connect(db_path)
             cursor = conn.cursor()
@@ -37,32 +49,29 @@ def check_phase1():
             conn.close()
             
             table_names = [t[0] for t in tables]
-            print(f"   Found {len(tables)} tables")
+            has_expenses = 'expenses' in table_names
+            has_categories = 'categories' in table_names
             
-            if 'expenses' in table_names and 'categories' in table_names:
-                print("   Both tables exist")
-            else:
-                print(f"   Missing tables. Found: {table_names}")
-                
+            check_item(f"Found {len(tables)} tables", len(tables) > 0)
+            check_item("expenses table exists", has_expenses)
+            check_item("categories table exists", has_categories)
+            
         except Exception as e:
-            print(f"   Database error: {e}")
-    else:
-        print("   Database file not found")
+            check_item("Database connection", False, f"Error: {e}")
     
-    # Models check
-    print("\n2. MODELS CHECK")
+    print_header("MODELS CHECK")
+    
     expense_path = project_root / "models" / "expense_model.py"
     category_path = project_root / "models" / "category_model.py"
     
+    check_item("expense_model.py exists", expense_path.exists())
+    check_item("category_model.py exists", category_path.exists())
+    
     if expense_path.exists() and category_path.exists():
-        print("   Model files exist")
-        
         try:
             sys.path.insert(0, str(project_root))
             from models.expense_model import Expense
             from models.category_model import Category
-            
-            print("   Models can be imported")
             
             from datetime import date
             from decimal import Decimal
@@ -73,77 +82,64 @@ def check_phase1():
                 amount=Decimal("10000"),
                 description="Test"
             )
-            print("   Expense model works")
+            check_item("Expense model import", True)
             
             category = Category(name="Test")
-            print("   Category model works")
+            check_item("Category model import", True)
             
         except ImportError as e:
-            print(f"   Import error: {e}")
+            check_item("Models import", False, f"Import error: {e}")
         except Exception as e:
-            print(f"   Error: {e}")
-    else:
-        print("   Model files missing")
+            check_item("Models instantiation", False, f"Error: {e}")
     
-    # Validation check
-    print("\n3. VALIDATION CHECK")
+    print_header("VALIDATION CHECK")
+    
     validation_path = project_root / "utils" / "validation.py"
+    check_item("validation.py exists", validation_path.exists())
     
     if validation_path.exists():
-        print("   Validation file exists")
-        
         try:
             from utils.validation import validate_date, validate_amount
-            
-            print("   Validation functions can be imported")
+            check_item("Validation functions import", True)
             
             valid, _ = validate_date("2024-01-15")
-            print(f"   Date validation works: {valid}")
+            check_item("validate_date() works", valid)
             
         except ImportError as e:
-            print(f"   Import error: {e}")
+            check_item("Validation import", False, f"Import error: {e}")
         except Exception as e:
-            print(f"   Error: {e}")
-    else:
-        print("   Validation file missing")
+            check_item("Validation functions", False, f"Error: {e}")
     
-    # Requirements check
-    print("\n4. REQUIREMENTS CHECK")
+    print_header("REQUIREMENTS CHECK")
+    
     requirements_path = project_root / "requirements.txt"
+    check_item("requirements.txt exists", requirements_path.exists())
     
     if requirements_path.exists():
-        print("   requirements.txt exists")
-        
         try:
             with open(requirements_path, 'r') as f:
                 content = f.read()
             
-            if 'matplotlib' in content and 'pandas' in content:
-                print("   Contains matplotlib and pandas")
-            else:
-                print("   Missing some dependencies")
-        except:
-            print("   Cannot read requirements.txt")
-    else:
-        print("   requirements.txt missing")
+            has_matplotlib = 'matplotlib' in content
+            has_pandas = 'pandas' in content
+            
+            check_item("matplotlib in requirements", has_matplotlib)
+            check_item("pandas in requirements", has_pandas)
+            
+        except Exception as e:
+            check_item("Read requirements.txt", False, f"Error: {e}")
     
-    # Git check
-    print("\n5. GIT CHECK")
+    print_header("GIT CHECK")
+    
     git_dir = project_root / ".git"
+    gitignore_path = project_root / ".gitignore"
     
-    if git_dir.exists():
-        print("   Git repository initialized")
-        
-        gitignore_path = project_root / ".gitignore"
-        if gitignore_path.exists():
-            print("   .gitignore exists")
-        else:
-            print("   .gitignore missing")
-    else:
-        print("   Git repository not initialized")
+    check_item("Git repository initialized", git_dir.exists())
+    check_item(".gitignore exists", gitignore_path.exists())
     
-    print_header("SUMMARY")
-    print("\nFix any items above before proceeding to Phase 2.")
+    print_header("PHASE 1 VERIFICATION RESULTS")
+    
+    print("\nRun: python phase2-verify.py for Phase 2 verification")
 
 if __name__ == "__main__":
     check_phase1()

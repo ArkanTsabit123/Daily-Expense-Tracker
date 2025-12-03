@@ -5,6 +5,7 @@ This module checks if a given phase is valid for phase 1.
 """
 
 from pathlib import Path
+import sys
 
 def print_header(text):
     print("\n" + "=" * 60)
@@ -45,7 +46,7 @@ class Expense:
     with open(expense_model_path, 'w', encoding='utf-8') as f:
         f.write(expense_model_content)
     
-    print(f"Fixed expense_model.py")
+    print("Fixed expense_model.py")
     return True
 
 def fix_category_model():
@@ -77,7 +78,7 @@ class Category:
     with open(category_model_path, 'w', encoding='utf-8') as f:
         f.write(category_model_content)
     
-    print(f"Fixed category_model.py")
+    print("Fixed category_model.py")
     return True
 
 def test_models():
@@ -86,7 +87,6 @@ def test_models():
     project_root = Path(__file__).parent
     
     try:
-        import sys
         sys.path.insert(0, str(project_root))
         
         from models.expense_model import Expense
@@ -112,12 +112,6 @@ def test_models():
         )
         print(f"Category: {category.name} - Budget: Rp {category.budget_limit}")
         
-        expense_dict = expense.to_dict()
-        print(f"Expense to_dict: {expense_dict['category']}")
-        
-        category_dict = category.to_dict()
-        print(f"Category to_dict: {category_dict['name']}")
-        
         return True
         
     except ImportError as e:
@@ -128,7 +122,7 @@ def test_models():
         return False
 
 def main():
-    print_header("FIXING DATA MODELS ONLY")
+    print_header("Phase 1 Model Fixer")
     
     fix_expense_model()
     fix_category_model()
@@ -136,11 +130,10 @@ def main():
     success = test_models()
     
     if success:
-        print_header("MODELS FIXED SUCCESSFULLY!")
-        print("\nRun verification:")
-        print("python verify_phase1.py")
+        print_header("Models fixed successfully")
+        print("\nRun: python phase1-verify.py")
     else:
-        print_header("MODELS FIX FAILED")
+        print_header("Model fix failed")
     
     return success
 
