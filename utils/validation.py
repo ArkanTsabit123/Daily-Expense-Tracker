@@ -9,6 +9,7 @@ import re
 from datetime import datetime, date
 from decimal import Decimal, InvalidOperation
 from typing import Optional, Tuple, List
+from datetime import datetime
 
 
 def validate_date(date_string: str, date_format: str = '%Y-%m-%d') -> Tuple[bool, Optional[date]]:
@@ -18,7 +19,24 @@ def validate_date(date_string: str, date_format: str = '%Y-%m-%d') -> Tuple[bool
         return True, parsed_date
     except ValueError:
         return False, None
+    
+    
+def validate_date(date_string: str, format: str = '%Y-%m-%d') -> bool:
+    try:
+        datetime.strptime(date_string, format)
+        return True
+    except ValueError:
+        return False
 
+
+def validate_amount(amount_string: str) -> bool:
+    try:
+        cleaned = re.sub(r'[^\d.,]', '', amount_string)
+        cleaned = cleaned.replace(',', '.')
+        amount = Decimal(cleaned)
+        return amount >= 0
+    except (InvalidOperation, ValueError):
+        return False
 
 def validate_amount(amount_string: str) -> Tuple[bool, Optional[Decimal]]:
     """Validate amount format"""
