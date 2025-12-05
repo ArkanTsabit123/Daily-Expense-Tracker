@@ -1,0 +1,34 @@
+# Include non-Python files in package distribution
+include LICENSE
+include README.md
+include requirements.txt
+include CONTRIBUTING.md
+include .gitignore
+
+# Include all documentation files
+recursive-include docs *.md
+
+# Include data files
+recursive-include data *.db *.sql
+
+# Include export examples
+recursive-include exports *.csv *.xlsx
+
+# Include generated charts
+recursive-include charts *.png *.jpg
+
+# Include configuration files
+recursive-include config *.json *.yaml *.yml
+
+# Exclude unnecessary files
+global-exclude __pycache__
+global-exclude *.py[cod]
+global-exclude *$py.class
+global-exclude *.so
+global-exclude .DS_Store
+global-exclude .git
+global-exclude .github
+global-exclude .vscode
+global-exclude venv
+global-exclude env
+global-exclude .env

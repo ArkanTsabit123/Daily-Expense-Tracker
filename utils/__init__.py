@@ -1,4 +1,4 @@
-# project portofolio\junior projects\daily-expense-tracker\utils\__init__.py
+# project portofolio/junior projects/daily-expense-tracker/utils/__init__.py
 
 """
 Utils Package

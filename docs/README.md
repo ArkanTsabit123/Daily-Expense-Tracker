@@ -1,4 +1,4 @@
-# Daily Expense Tracker
+# Daily Expense Tracker 
 
 A useful Python application for tracking and analyzing daily expenses with data visualization and reporting capabilities. Built with modular architecture following professional software design patterns.
 
@@ -78,7 +78,6 @@ daily-expense-tracker/
 ├── charts/                    # Generated chart storage
 ├── __init__.py               # Main package
 ├── main.py                   # Main application entry point
-├── run.py                    # Application runner
 ├── requirements.txt          # Python dependencies
 ├── README.md                 # This file
 ├── .gitignore                # Git ignore rules
@@ -170,6 +169,32 @@ Please select an option:
 ### Setting Up Development Environment
 ```bash
 # Clone repository
+## 📋 Table of Contents
+
+### 📖 User Documentation
+- [User Guide](usage.md) - Complete usage instructions
+- [Quick Start](usage.md#quick-start) - Get started in 5 minutes
+- [Features Overview](usage.md#features) - All available features
+- [FAQ](faq.md) - Frequently asked questions
+
+### 🔧 Developer Documentation
+- [Architecture Guide](development.md) - System design and architecture
+- [Testing Guide](testing.md) - Testing procedures and setup
+- [Deployment Guide](deployment.md) - Deployment instructions
+- [API Reference](api.md) - Service and function documentation
+
+### 📊 Project Documentation
+- [Project Plan](../project_plan.md) - Development timeline and phases
+- [Contributing Guidelines](../CONTRIBUTING.md) - How to contribute to this project
+- [License](../LICENSE) - Project license information
+- [Changelog](../CHANGELOG.md) - Version history and changes
+
+### 🚀 Quick Links
+- [GitHub Repository](https://github.com/ArkanTsabit123/Daily-Expense-Tracker)
+- [Issue Tracker](https://github.com/ArkanTsabit123/Daily-Expense-Tracker/issues)
+- [Download Latest Release](https://github.com/ArkanTsabit123/Daily-Expense-Tracker/releases)
+
+
 git clone https://github.com/yourusername/daily-expense-tracker.git
 cd daily-expense-tracker
 

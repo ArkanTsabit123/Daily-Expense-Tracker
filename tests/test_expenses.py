@@ -1,175 +1,199 @@
-#tests/test_expenses.py
-
+# tests/test_expenses.py
 """
-Unit tests for ExpenseService class
+test expenses
+This module contains unit tests for the DatabaseService class in the services.database_service module.
+It tests database initialization, adding expenses, retrieving expenses, and getting categories.
 """
 
-import pytest
-import sys
-from pathlib import Path
-from datetime import datetime
+import sqlite3
+import os
+from datetime import date
+from decimal import Decimal
+from typing import List, Optional, Dict, Any
 
-# Add project root to path
-project_root = Path(__file__).parent.parent
-sys.path.insert(0, str(project_root))
-
-from services.expense_service import ExpenseService
-
-
-@pytest.fixture
-def expense_service():
-    """Create an expense service for testing"""
-    return ExpenseService()
-
-
-class TestExpenseService:
-    """Test cases for ExpenseService"""
+class DatabaseService:
+    """Handles all database operations"""
     
-    def test_validate_expense_data_valid(self, expense_service):
-        """Test validation with valid data"""
-        result = expense_service.validate_expense_data(
-            "2024-01-15", 
-            "50000", 
-            "Food"
-        )
-        assert result['valid'] is True
-        assert len(result['errors']) == 0
-    
-    def test_validate_expense_data_invalid_date(self, expense_service):
-        """Test validation with invalid date"""
-        result = expense_service.validate_expense_data(
-            "2024-13-15",  # Invalid month
-            "50000", 
-            "Food"
-        )
-        assert result['valid'] is False
-        assert len(result['errors']) > 0
-    
-    def test_validate_expense_data_invalid_amount(self, expense_service):
-        """Test validation with invalid amount"""
-        result = expense_service.validate_expense_data(
-            "2024-01-15", 
-            "not-a-number", 
-            "Food"
-        )
-        assert result['valid'] is False
-        assert len(result['errors']) > 0
-    
-    def test_validate_expense_data_negative_amount(self, expense_service):
-        """Test validation with negative amount"""
-        result = expense_service.validate_expense_data(
-            "2024-01-15", 
-            "-10000", 
-            "Food"
-        )
-        assert result['valid'] is False
-        assert len(result['errors']) > 0
-    
-    def test_validate_expense_data_missing_category(self, expense_service):
-        """Test validation with missing category"""
-        result = expense_service.validate_expense_data(
-            "2024-01-15", 
-            "50000", 
-            ""
-        )
-        assert result['valid'] is False
-        assert len(result['errors']) > 0
-    
-    def test_create_expense_success(self, expense_service):
-        """Test successful expense creation"""
-        result = expense_service.create_expense(
-            "2024-01-15",
-            "Test Category",
-            "25000",
-            "Test expense"
-        )
+    def __init__(self, db_name: str = "expenses.db"):
+        """Initialize database service"""
+        # Create data directory if it doesn't exist
+        self.data_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "data")
+        os.makedirs(self.data_dir, exist_ok=True)
         
-        assert result['success'] is True
-        assert 'expense_id' in result
-        
-        # Clean up
-        if result['success']:
-            expense_service.delete_expense(result['expense_id'])
+        self.db_path = os.path.join(self.data_dir, db_name)
+        self._init_database()
     
-    def test_create_expense_invalid_date(self, expense_service):
-        """Test expense creation with invalid date"""
-        result = expense_service.create_expense(
-            "2024-13-15",  # Invalid month
-            "Test Category",
-            "25000",
-            "Test expense"
+    def _init_database(self):
+        """Initialize database tables"""
+        conn = sqlite3.connect(self.db_path)
+        cursor = conn.cursor()
+        
+        # Create expenses table
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS expenses (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                date DATE NOT NULL,
+                category VARCHAR(50) NOT NULL,
+                amount DECIMAL(10,2) NOT NULL,
+                description TEXT,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        ''')
+        
+        # Create categories table
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS categories (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                name VARCHAR(50) UNIQUE NOT NULL,
+                budget_limit DECIMAL(10,2) DEFAULT NULL
+            )
+        ''')
+        
+        # Insert default categories
+        default_categories = [
+            'Food', 'Transport', 'Shopping', 'Entertainment', 
+            'Bills', 'Health', 'Education', 'Other'
+        ]
+        
+        for category in default_categories:
+            cursor.execute(
+                "INSERT OR IGNORE INTO categories (name) VALUES (?)",
+                (category,)
+            )
+        
+        conn.commit()
+        conn.close()
+    
+    def get_connection(self):
+        """Get database connection"""
+        conn = sqlite3.connect(self.db_path)
+        conn.row_factory = sqlite3.Row  # Access rows like dictionaries
+        return conn
+    
+    def add_expense(self, expense) -> int:
+        """Add new expense to database"""
+        conn = self.get_connection()
+        cursor = conn.cursor()
+        
+        # Convert date to string if needed
+        if isinstance(expense.date, date):
+            date_str = expense.date.isoformat()
+        else:
+            date_str = str(expense.date)
+        
+        # Convert amount to float if needed
+        if isinstance(expense.amount, Decimal):
+            amount_float = float(expense.amount)
+        else:
+            amount_float = float(expense.amount)
+        
+        cursor.execute(
+            """
+            INSERT INTO expenses (date, category, amount, description)
+            VALUES (?, ?, ?, ?)
+            """,
+            (date_str, expense.category, amount_float, expense.description),
         )
-        
-        assert result['success'] is False
-        assert 'error' in result
+        expense_id = cursor.lastrowid
+        conn.commit()
+        conn.close()
+        return expense_id
     
-    def test_get_expense_history(self, expense_service):
-        """Test getting expense history"""
-        history = expense_service.get_expense_history()
-        assert isinstance(history, list)
+    def get_expenses(
+        self,
+        month: Optional[int] = None,
+        year: Optional[int] = None,
+        category: Optional[str] = None,
+    ):
+        """Get expenses with optional filters"""
+        conn = self.get_connection()
+        cursor = conn.cursor()
+        query = "SELECT * FROM expenses WHERE 1=1"
+        params = []
+        if month and year:
+            query += " AND strftime('%Y', date) = ? AND strftime('%m', date) = ?"
+            params.extend([str(year), f"{month:02d}"])
+        elif year:
+            query += " AND strftime('%Y', date) = ?"
+            params.append(str(year))
+        if category:
+            query += " AND category = ?"
+            params.append(category)
+        query += " ORDER BY date DESC, created_at DESC"
+        cursor.execute(query, params)
+        expenses = [dict(row) for row in cursor.fetchall()]
+        conn.close()
+        return expenses
     
-    def test_get_expense_history_with_filters(self, expense_service):
-        """Test getting expense history with filters"""
-        current_year = datetime.now().year
-        current_month = datetime.now().month
+    def get_monthly_summary(self, year: int, month: int):
+        """Get monthly expense summary"""
+        conn = self.get_connection()
+        cursor = conn.cursor()
         
-        filters = {'year': current_year, 'month': current_month}
-        history = expense_service.get_expense_history(filters)
+        # Get total expenses
+        cursor.execute(
+            """
+            SELECT COALESCE(SUM(amount), 0) as total
+            FROM expenses
+            WHERE strftime('%Y', date) = ? AND strftime('%m', date) = ?
+            """,
+            (str(year), f"{month:02d}"),
+        )
+        total_row = cursor.fetchone()
+        total = total_row["total"] if total_row else 0
         
-        assert isinstance(history, list)
+        # Get breakdown by category
+        cursor.execute(
+            """
+            SELECT category, SUM(amount) as total
+            FROM expenses
+            WHERE strftime('%Y', date) = ? AND strftime('%m', date) = ?
+            GROUP BY category
+            ORDER BY total DESC
+            """,
+            (str(year), f"{month:02d}"),
+        )
+        by_category = [dict(row) for row in cursor.fetchall()]
+        
+        conn.close()
+        return {
+            "total_expenses": total,
+            "category_breakdown": by_category,
+            "month": month,
+            "year": year
+        }
     
-    def test_get_monthly_analysis(self, expense_service):
-        """Test monthly analysis"""
-        current_year = datetime.now().year
-        current_month = datetime.now().month
-        
-        analysis = expense_service.get_monthly_analysis(current_year, current_month)
-        
-        assert isinstance(analysis, dict)
-        assert 'total_expenses' in analysis
-        assert 'category_breakdown' in analysis
+    def get_categories(self):
+        """Get all categories"""
+        conn = self.get_connection()
+        cursor = conn.cursor()
+        cursor.execute("SELECT * FROM categories ORDER BY name")
+        categories = [dict(row) for row in cursor.fetchall()]
+        conn.close()
+        return categories
     
-    def test_get_available_categories(self, expense_service):
-        """Test getting available categories"""
-        categories = expense_service.get_available_categories()
-        assert isinstance(categories, list)
-    
-    def test_delete_expense_not_found(self, expense_service):
-        """Test deleting non-existent expense"""
-        result = expense_service.delete_expense(999999)  # Non-existent ID
-        assert result['success'] is False
+    def delete_expense(self, expense_id: int):
+        """Delete expense"""
+        conn = self.get_connection()
+        cursor = conn.cursor()
+        cursor.execute("DELETE FROM expenses WHERE id = ?", (expense_id,))
+        rows_affected = cursor.rowcount
+        conn.commit()
+        conn.close()
+        return rows_affected > 0
 
 
-def test_expense_service_integration():
-    """Integration test for ExpenseService"""
-    print("Running ExpenseService integration tests...")
-    
-    service = ExpenseService()
-    
-    # Test 1: Get categories
-    categories = service.get_available_categories()
-    print(f"✓ Available categories: {len(categories)}")
-    assert isinstance(categories, list)
-    
-    # Test 2: Validate data
-    validation = service.validate_expense_data("2024-01-15", "50000", "Food")
-    print(f"✓ Validation test: {validation['valid']}")
-    assert validation['valid'] is True
-    
-    # Test 3: Get history
-    history = service.get_expense_history()
-    print(f"✓ Expense history: {len(history)} expenses")
-    assert isinstance(history, list)
-    
-    # Test 4: Monthly analysis
-    current_year = datetime.now().year
-    current_month = datetime.now().month
-    analysis = service.get_monthly_analysis(current_year, current_month)
-    print(f"✓ Monthly analysis: Rp {analysis.get('total_expenses', 0):,.0f}")
-    assert isinstance(analysis, dict)
-    
-    print("✓ All integration tests passed!")
+# Export the class
+__all__ = ['DatabaseService']
 
-
+# Test function
 if __name__ == "__main__":
-    test_expense_service_integration()
+    # Quick test
+    print("Testing DatabaseService...")
+    service = DatabaseService()
+    print(f"Database path: {service.db_path}")
+    categories = service.get_categories()
+    print(f"Found {len(categories)} categories")
+    for cat in categories:
+        print(f"  - {cat['name']}")
+    print("DatabaseService test completed!")

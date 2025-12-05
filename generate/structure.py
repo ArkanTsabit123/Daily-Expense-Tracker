@@ -1,4 +1,4 @@
-#project portofolio\junior projects\daily-expense-tracker\generate\structure.py
+# project portofolio/junior projects/daily-expense-tracker/generate/structure.py
 
 """
 View daily-expense-tracker - Project Structure
@@ -62,7 +62,6 @@ def show_structure():
     ├── .gitignore                # Git ignore rules
     └── pyproject.toml            # Build system configuration
     """
-    
     print(structure)
     print("=" * 60)
     print("Structure: 11 directories, 44 files")
