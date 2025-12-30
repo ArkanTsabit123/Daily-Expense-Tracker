@@ -40,7 +40,7 @@ class ExpenseTrackerApp:
         """Display header with title"""
         self.clear_screen()
         print("=" * 60)
-        print("💰 DAILY EXPENSE TRACKER".center(60))
+        print("💵 EXPENSE TRACKER".center(60))
         print(f"📋 {title}".center(60))
         print("=" * 60)
         print()
