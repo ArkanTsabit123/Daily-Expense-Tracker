@@ -1,25 +1,22 @@
-Here's the repaired README.md with corrections and improvements:
-
 ```markdown
 # Daily Expense Tracker 
 
 A Python application for tracking daily expenses with data visualization and reporting capabilities.
 
-## 📋 Features
+## Features
 
-### 📊 Core Features
+### Core Features
 - **Expense Management**: Add, view, update, delete expenses
 - **Monthly Analysis**: Category breakdowns with percentages
 - **Data Visualization**: Pie charts for expense distribution
 - **Export Functionality**: CSV and Excel reports
-
-### 🛠️ Technical Features
+### Technical Features
 - **Layered Architecture**: Models-Services-Utils separation
 - **Database**: SQLite with indexing for performance
-- **Testing**: Comprehensive pytest test suite
+- **Testing**: pytest test suite
 - **Code Quality**: Black formatting, Flake8 linting
 
-## 🚀 Quick Start
+## Quick Start
 
 ### Installation
 ```bash
@@ -112,7 +109,7 @@ CREATE TABLE categories (
 );
 ```
 
-## 🧪 Development
+## Development
 
 ### Running Tests
 ```bash
@@ -138,7 +135,7 @@ flake8 .
 mypy .
 ```
 
-## 📊 Output Examples
+## Output Examples
 
 ### Generated Charts
 - **Pie Charts**: Expense distribution by category
@@ -148,7 +145,7 @@ mypy .
 - **CSV**: Comma-separated values for spreadsheet import
 - **Excel**: Formatted multi-sheet reports with auto-adjusting columns
 
-## 📦 Dependencies
+## Dependencies
 
 ### Core Requirements
 ```
@@ -165,7 +162,7 @@ black==23.9.1           # Code formatting
 flake8==6.1.0           # Code linting
 ```
 
-## 🔮 Future Enhancements
+## Future Enhancements
 
 ### Planned Features
 1. **User Authentication** - Multi-user support with login system
@@ -177,7 +174,7 @@ flake8==6.1.0           # Code linting
 7. **Bank Integration** - API connections for auto-import
 8. **Advanced Analytics** - Predictive spending insights
 
-## 🤝 Contributing
+## Contributing
 
 Contributions are welcome! Please follow these steps:
 
@@ -204,17 +201,17 @@ Contributions are welcome! Please follow these steps:
 - Use descriptive commit messages
 - Ensure your code passes all existing tests
 
-## 📄 License
+## License
 
 This project is available for educational and personal use. Commercial use requires permission.
 
-## 🙏 Acknowledgments
+## Acknowledgments
 
 - Built as a portfolio project to demonstrate Python development skills
 - Inspired by the need for personal finance management tools
 - Uses open-source libraries: Matplotlib, Pandas, OpenPyXL
 
-## ❓ Support
+## Support
 
 For issues or questions:
 1. Check the existing documentation
