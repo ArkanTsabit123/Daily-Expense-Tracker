@@ -1,25 +1,106 @@
-# Python
+# ============================================================
+# PYTHON CACHE & COMPILED FILES
+# ============================================================
 __pycache__/
 *.py[cod]
-*.class
+*$py.class
 *.so
 .Python
-env/
+*.pyc
+*.pyo
+*.pyd
+
+# ============================================================
+# VIRTUAL ENVIRONMENT
+# ============================================================
 venv/
+.venv/
+env/
+.env/
 ENV/
 env.bak/
 venv.bak/
 
-# Database
+# ============================================================
+# DATABASE FILES
+# ============================================================
 *.db
-*.db-journal
+*.sqlite
 *.sqlite3
+*.db-journal
+*.db-wal
+*.db-shm
+data/*.db
+data/*.sqlite
+sample_expenses.db
+expense_tracker.db
 
-# Logs
+# ============================================================
+# BACKUP FILES
+# ============================================================
+*.backup
+*.bak
+*_backup_*.db
+*.old
+*.orig
+*.save
+data/backup/
+backups/
+
+# ============================================================
+# LOG FILES
+# ============================================================
 logs/
 *.log
+*.log.*
 
-# OS generated files
+# ============================================================
+# COVERAGE & TEST REPORTS
+# ============================================================
+.coverage
+.coverage.*
+htmlcov/
+coverage_html_report/
+coverage.xml
+*.cover
+.pytest_cache/
+.tox/
+.nox/
+coverage/
+.hypothesis/
+
+# ============================================================
+# REPORTS & EXPORTS
+# ============================================================
+exports/
+*.csv
+*.xlsx
+*.xls
+*.json
+*.xml
+*.html
+*.pdf
+
+# ============================================================
+# IDE & EDITOR FILES
+# ============================================================
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+desktop.ini
+*.iml
+.project
+.classpath
+.settings/
+*.code-workspace
+
+# ============================================================
+# OS FILES
+# ============================================================
 .DS_Store
 .DS_Store?
 ._*
@@ -27,21 +108,76 @@ logs/
 .Trashes
 ehthumbs.db
 Thumbs.db
+Desktop.ini
 
-# IDE
-.vscode/
-.idea/
-*.swp
-*.swo
-*~
-
-# Project specific
-*.env
-*.env.local
-*.env.development.local
-*.env.test.local
-*.env.production.local
-
-# Temp files
+# ============================================================
+# PROJECT SPECIFIC
+# ============================================================
+data/backup/
+backup/
+verification_report.json
+progress_report.json
+comprehensive_report.json
+_report.json
+debug.py
+debug/
 temp/
 tmp/
+visualization/temp/
+visualization/cache/
+
+# ============================================================
+# SECRETS & SENSITIVE DATA
+# ============================================================
+*.pem
+*.key
+*.crt
+*.p12
+*.pfx
+.secrets/
+secrets/
+.env.local
+.env.*.local
+*.secret
+
+# ============================================================
+# PACKAGE MANAGEMENT
+# ============================================================
+*.egg-info/
+*.egg
+dist/
+build/
+wheelhouse/
+.pip-cache/
+.pip-downloads/
+*.whl
+*.tar.gz
+*.tgz
+
+# ============================================================
+# JUPYTER NOTEBOOKS
+# ============================================================
+.ipynb_checkpoints/
+*.ipynb
+
+# ============================================================
+# MISCELLANEOUS
+# ============================================================
+*.tmp
+*.temp
+*.lock
+package-lock.json
+yarn.lock
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# ============================================================
+# PHASE FILES (TIDAK MASUK GIT)
+# ============================================================
+phase*-fixer.py
+phase*-verify.py
+phase-all-summary.py
+phase-summary.py
+check-all-progress.py
+structure-tree.py

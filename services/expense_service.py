@@ -1,4 +1,4 @@
-#services/expense_service.py
+# services/expense_service.py
 
 """
 Expense Service
@@ -24,8 +24,17 @@ logger = logging.getLogger(__name__)
 class ExpenseService:
     """Business logic layer for expense operations"""
 
-    def __init__(self):
-        self.db_service = DatabaseService()
+    def __init__(self, db_service=None):
+        """
+        Initialize ExpenseService with optional db_service.
+        
+        Args:
+            db_service: Optional DatabaseService instance. If not provided, creates a new one.
+        """
+        if db_service is not None:
+            self.db_service = db_service
+        else:
+            self.db_service = DatabaseService()
 
     def create_expense(
         self, date_str: str, category: str, amount_str: str, description: str = ""
@@ -177,6 +186,70 @@ class ExpenseService:
             logger.error(f"Error updating expense {expense_id}: {e}")
             return {"success": False, "error": f"System error: {str(e)}"}
 
+    def get_categories(self) -> List[str]:
+        """
+        Get all unique categories from expenses.
+        
+        Returns:
+            List[str]: List of unique category names
+        """
+        try:
+            results = self.db_service.execute_query(
+                "SELECT DISTINCT category FROM expenses ORDER BY category"
+            )
+            return [row['category'] for row in results] if results else []
+        except Exception as e:
+            logger.error(f"Error getting categories: {e}")
+            return []
+
+    def get_expenses(
+        self,
+        start_date: Optional[str] = None,
+        end_date: Optional[str] = None,
+        category: Optional[str] = None,
+        month_year: Optional[str] = None,
+    ) -> List[Dict]:
+        """
+        Get expenses with optional filters.
+        
+        Args:
+            start_date: Filter expenses from this date (YYYY-MM-DD)
+            end_date: Filter expenses up to this date (YYYY-MM-DD)
+            category: Filter by category
+            month_year: Filter by month-year (YYYY-MM)
+            
+        Returns:
+            List[Dict]: List of expense dictionaries matching the filters
+        """
+        try:
+            query = "SELECT * FROM expenses WHERE 1=1"
+            params = []
+
+            if start_date:
+                query += " AND date >= ?"
+                params.append(start_date)
+
+            if end_date:
+                query += " AND date <= ?"
+                params.append(end_date)
+
+            if category:
+                query += " AND category = ?"
+                params.append(category)
+
+            if month_year:
+                query += " AND strftime('%Y-%m', date) = ?"
+                params.append(month_year)
+
+            query += " ORDER BY date DESC"
+
+            results = self.db_service.execute_query(query, tuple(params))
+            return results if results else []
+
+        except Exception as e:
+            logger.error(f"Error getting expenses with filters: {e}")
+            return []
+
 
 def test_expense_service():
     """Test the ExpenseService class"""
@@ -201,6 +274,14 @@ def test_expense_service():
     current_month = datetime.now().month
     analysis = service.get_monthly_analysis(current_year, current_month)
     print(f"   Monthly total: Rp {analysis.get('total_expenses', 0):,.0f}")
+
+    print("\n5. Testing get_categories...")
+    cats = service.get_categories()
+    print(f"   Categories found: {cats}")
+
+    print("\n6. Testing get_expenses with filters...")
+    filtered = service.get_expenses(category="Food")
+    print(f"   Food expenses: {len(filtered)} found")
 
     print("\nExpense service test completed!")
 
