@@ -1,11 +1,8 @@
-# 📝 **README.md - Complete Single File**
-
-```markdown
 # 💰 Daily Expense Tracker
 
 A comprehensive Python application for tracking daily expenses with advanced features including income tracking, budget management, recurring expenses, and data visualization.
 
-## 📋 Features
+## Features
 
 ### 📊 Core Features
 - **Expense Management**: Add, view, update, delete expenses with categories
@@ -29,9 +26,10 @@ A comprehensive Python application for tracking daily expenses with advanced fea
 - **Layered Architecture**: Models-Services-Utils separation
 - **Database**: SQLite with indexing for performance
 - **Multiple Interfaces**: CLI and GUI in one application
+- **Testing**: pytest test suite
 - **Code Quality**: Black formatting, Flake8 linting
 
-## 🚀 Quick Start
+## Quick Start
 
 ### Installation
 ```bash
@@ -81,7 +79,6 @@ Daily-Expense-Tracker/
 ├── cli.py                      # CLI application (full features)
 ├── gui.py                      # GUI application (full features)
 ├── run.py                      # Application launcher
-├── main.py                     # Original main application
 ├── requirements.txt            # Dependencies
 └── README.md                   # Documentation
 ```
@@ -295,7 +292,7 @@ black==23.9.1           # Code formatting
 flake8==6.1.0           # Code linting
 ```
 
-## 🔮 Future Enhancements
+## Future Enhancements
 
 ### Planned Features
 1. **User Authentication** - Multi-user support with login system
@@ -309,7 +306,7 @@ flake8==6.1.0           # Code linting
 9. **Dark/Light Theme** - Toggle between themes in GUI
 10. **Export Filtering** - Export specific date ranges or categories
 
-## 🤝 Contributing
+## Contributing
 
 Contributions are welcome! Please follow these steps:
 
@@ -335,18 +332,18 @@ Contributions are welcome! Please follow these steps:
 - Use descriptive commit messages
 - Ensure your code passes all existing tests
 
-## 📄 License
+## License
 
 This project is available for educational and personal use. Commercial use requires permission.
 
-## 🙏 Acknowledgments
+## Acknowledgments
 
 - Built as a portfolio project to demonstrate Python development skills
 - Inspired by the need for personal finance management tools
 - Uses open-source libraries: Matplotlib, Pandas, OpenPyXL
 - SQLite for lightweight local database storage
 
-## ❓ Support
+## Support
 
 For issues or questions:
 1. Check the existing documentation
@@ -357,5 +354,3 @@ For issues or questions:
 ---
 
 **Happy Tracking!** ⭐
-```
-
