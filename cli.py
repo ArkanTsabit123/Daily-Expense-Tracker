@@ -33,6 +33,11 @@ from utils.date_utils import get_current_month_year, get_month_name
 from utils.formatters import format_category, format_currency, format_date
 from utils.validation import validate_amount, validate_date, parse_amount
 
+# ============================================================
+# DATABASE PATH CONSTANT
+# ============================================================
+DB_PATH = "data/expenses.db"
+
 
 class ExpenseTrackerApp:
     """
@@ -56,7 +61,7 @@ class ExpenseTrackerApp:
 
     def init_additional_tables(self):
         """Initialize additional database tables for new features"""
-        conn = sqlite3.connect('expense_tracker.db')
+        conn = sqlite3.connect(DB_PATH)
         cursor = conn.cursor()
         
         # Create expenses table if not exists (with payment_method)
@@ -71,6 +76,15 @@ class ExpenseTrackerApp:
                 created_at TEXT DEFAULT CURRENT_TIMESTAMP
             )
         ''')
+        
+        # Check if payment_method column exists
+        cursor.execute("PRAGMA table_info(expenses)")
+        columns = [col[1] for col in cursor.fetchall()]
+        if 'payment_method' not in columns:
+            try:
+                cursor.execute("ALTER TABLE expenses ADD COLUMN payment_method TEXT DEFAULT 'Cash'")
+            except sqlite3.OperationalError:
+                pass
         
         # Incomes table
         cursor.execute('''
@@ -150,7 +164,7 @@ class ExpenseTrackerApp:
 
     def get_total_income(self, month=None, year=None, all_time=False) -> float:
         """Get total income for period"""
-        conn = sqlite3.connect('expense_tracker.db')
+        conn = sqlite3.connect(DB_PATH)
         cursor = conn.cursor()
         
         if all_time:
@@ -169,12 +183,43 @@ class ExpenseTrackerApp:
 
     def get_expense_tags(self, expense_id: int) -> List[str]:
         """Get tags for an expense"""
-        conn = sqlite3.connect('expense_tracker.db')
+        conn = sqlite3.connect(DB_PATH)
         cursor = conn.cursor()
         cursor.execute("SELECT tag FROM expense_tags WHERE expense_id = ?", (expense_id,))
         rows = cursor.fetchall()
         conn.close()
         return [row[0] for row in rows]
+
+    def get_filters_from_user(self) -> Optional[Dict]:
+        """Get filters from user input for view history"""
+        print("\n🔍 Filter options:")
+        print("1. All Time")
+        print("2. Specific month")
+        print("3. Specific category")
+        print("4. Back")
+        
+        choice = input("\nSelect (1-4): ").strip()
+        
+        filters = {}
+        
+        if choice == "1":
+            return filters  # All time
+        elif choice == "2":
+            year = input(f"Year [{self.current_year}]: ").strip()
+            month = input(f"Month (1-12) [{self.current_month}]: ").strip()
+            filters['year'] = int(year) if year.isdigit() else self.current_year
+            filters['month'] = int(month) if month.isdigit() else self.current_month
+            return filters
+        elif choice == "3":
+            category = input("Category: ").strip()
+            if category:
+                filters['category'] = category
+            return filters
+        elif choice == "4":
+            return None
+        else:
+            print("❌ Invalid selection")
+            return None
 
     # ============================================================
     # INCOME FUNCTIONS
@@ -232,7 +277,7 @@ class ExpenseTrackerApp:
             confirm = input("\n✅ Save this income? (y/n): ").lower()
 
             if confirm == "y":
-                conn = sqlite3.connect('expense_tracker.db')
+                conn = sqlite3.connect(DB_PATH)
                 cursor = conn.cursor()
                 cursor.execute(
                     """INSERT INTO incomes (date, source, amount, description, is_recurring) 
@@ -264,7 +309,7 @@ class ExpenseTrackerApp:
             
             choice = input("\nSelect (1-3): ").strip()
             
-            conn = sqlite3.connect('expense_tracker.db')
+            conn = sqlite3.connect(DB_PATH)
             cursor = conn.cursor()
             
             if choice == "1":
@@ -345,7 +390,7 @@ class ExpenseTrackerApp:
         """View all budgets with progress"""
         self.display_header("BUDGET OVERVIEW")
         
-        conn = sqlite3.connect('expense_tracker.db')
+        conn = sqlite3.connect(DB_PATH)
         cursor = conn.cursor()
         cursor.execute("SELECT * FROM budgets")
         rows = cursor.fetchall()
@@ -421,7 +466,7 @@ class ExpenseTrackerApp:
         category = categories[int(cat_choice) - 1]
         
         # Check if budget exists
-        conn = sqlite3.connect('expense_tracker.db')
+        conn = sqlite3.connect(DB_PATH)
         cursor = conn.cursor()
         cursor.execute("SELECT monthly_limit FROM budgets WHERE category = ?", (category,))
         existing = cursor.fetchone()
@@ -452,7 +497,7 @@ class ExpenseTrackerApp:
             self.wait_for_enter()
             return
         
-        conn = sqlite3.connect('expense_tracker.db')
+        conn = sqlite3.connect(DB_PATH)
         cursor = conn.cursor()
         if existing:
             cursor.execute("UPDATE budgets SET monthly_limit = ? WHERE category = ?", (limit, category))
@@ -468,7 +513,7 @@ class ExpenseTrackerApp:
 
     def delete_budget(self):
         """Delete a budget"""
-        conn = sqlite3.connect('expense_tracker.db')
+        conn = sqlite3.connect(DB_PATH)
         cursor = conn.cursor()
         cursor.execute("SELECT category FROM budgets")
         rows = cursor.fetchall()
@@ -497,7 +542,7 @@ class ExpenseTrackerApp:
             self.wait_for_enter()
             return
         
-        conn = sqlite3.connect('expense_tracker.db')
+        conn = sqlite3.connect(DB_PATH)
         cursor = conn.cursor()
         cursor.execute("DELETE FROM budgets WHERE category = ?", (category,))
         conn.commit()
@@ -546,7 +591,7 @@ class ExpenseTrackerApp:
         """View all recurring expenses"""
         self.display_header("RECURRING EXPENSES LIST")
         
-        conn = sqlite3.connect('expense_tracker.db')
+        conn = sqlite3.connect(DB_PATH)
         cursor = conn.cursor()
         cursor.execute("SELECT * FROM recurring_expenses ORDER BY id DESC")
         rows = cursor.fetchall()
@@ -647,7 +692,7 @@ class ExpenseTrackerApp:
             confirm = input("\n✅ Save? (y/n): ").lower()
             
             if confirm == "y":
-                conn = sqlite3.connect('expense_tracker.db')
+                conn = sqlite3.connect(DB_PATH)
                 cursor = conn.cursor()
                 cursor.execute(
                     """INSERT INTO recurring_expenses 
@@ -672,7 +717,7 @@ class ExpenseTrackerApp:
         """Edit recurring expense"""
         self.display_header("EDIT RECURRING EXPENSE")
         
-        conn = sqlite3.connect('expense_tracker.db')
+        conn = sqlite3.connect(DB_PATH)
         cursor = conn.cursor()
         cursor.execute("SELECT id, category, amount FROM recurring_expenses ORDER BY id")
         rows = cursor.fetchall()
@@ -710,7 +755,7 @@ class ExpenseTrackerApp:
         else:
             amount = None
         
-        conn = sqlite3.connect('expense_tracker.db')
+        conn = sqlite3.connect(DB_PATH)
         cursor = conn.cursor()
         if amount:
             cursor.execute("UPDATE recurring_expenses SET amount = ? WHERE id = ?", (amount, rec_id))
@@ -726,7 +771,7 @@ class ExpenseTrackerApp:
         """Delete recurring expense"""
         self.display_header("DELETE RECURRING EXPENSE")
         
-        conn = sqlite3.connect('expense_tracker.db')
+        conn = sqlite3.connect(DB_PATH)
         cursor = conn.cursor()
         cursor.execute("SELECT id, category, amount FROM recurring_expenses ORDER BY id")
         rows = cursor.fetchall()
@@ -753,7 +798,7 @@ class ExpenseTrackerApp:
             self.wait_for_enter()
             return
         
-        conn = sqlite3.connect('expense_tracker.db')
+        conn = sqlite3.connect(DB_PATH)
         cursor = conn.cursor()
         cursor.execute("DELETE FROM recurring_expenses WHERE id = ?", (int(choice),))
         conn.commit()
@@ -766,7 +811,7 @@ class ExpenseTrackerApp:
         """Toggle recurring expense active status"""
         self.display_header("TOGGLE RECURRING EXPENSE")
         
-        conn = sqlite3.connect('expense_tracker.db')
+        conn = sqlite3.connect(DB_PATH)
         cursor = conn.cursor()
         cursor.execute("SELECT id, category, amount, active FROM recurring_expenses ORDER BY id")
         rows = cursor.fetchall()
@@ -788,7 +833,7 @@ class ExpenseTrackerApp:
             self.wait_for_enter()
             return
         
-        conn = sqlite3.connect('expense_tracker.db')
+        conn = sqlite3.connect(DB_PATH)
         cursor = conn.cursor()
         cursor.execute("SELECT active FROM recurring_expenses WHERE id = ?", (int(choice),))
         current = cursor.fetchone()
@@ -815,7 +860,7 @@ class ExpenseTrackerApp:
             self.wait_for_enter()
             return
         
-        conn = sqlite3.connect('expense_tracker.db')
+        conn = sqlite3.connect(DB_PATH)
         cursor = conn.cursor()
         cursor.execute("SELECT * FROM recurring_expenses WHERE active = 1")
         recurring = cursor.fetchall()
@@ -860,7 +905,7 @@ class ExpenseTrackerApp:
                 os.makedirs(backup_dir)
             
             backup_file = os.path.join(backup_dir, f"expense_backup_{timestamp}.db")
-            shutil.copy2("expense_tracker.db", backup_file)
+            shutil.copy2(DB_PATH, backup_file)
             
             print(f"✅ Database backed up to: {backup_file}")
         except Exception as e:
@@ -906,10 +951,10 @@ class ExpenseTrackerApp:
             # Backup current database first
             timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
             current_backup = os.path.join(backup_dir, f"pre_restore_backup_{timestamp}.db")
-            shutil.copy2("expense_tracker.db", current_backup)
+            shutil.copy2(DB_PATH, current_backup)
             
             # Restore from backup
-            shutil.copy2(backup_file, "expense_tracker.db")
+            shutil.copy2(backup_file, DB_PATH)
             
             print("✅ Database restored successfully!")
         except Exception as e:
@@ -1193,7 +1238,7 @@ class ExpenseTrackerApp:
             confirm = input("\n✅ Save this expense? (y/n): ").lower()
 
             if confirm == "y":
-                conn = sqlite3.connect('expense_tracker.db')
+                conn = sqlite3.connect(DB_PATH)
                 cursor = conn.cursor()
                 cursor.execute(
                     """INSERT INTO expenses (date, category, amount, description, payment_method) 
@@ -1484,6 +1529,193 @@ class ExpenseTrackerApp:
         print("=" * 60)
 
     # ============================================================
+    # GENERATE CHART MENU
+    # ============================================================
+
+    def generate_chart_menu(self):
+        """Generate chart menu"""
+        self.display_header("GENERATE CHART")
+        
+        print("1. Pie Chart (Category Distribution)")
+        print("2. Monthly Trend Chart")
+        print("3. Back")
+        
+        choice = input("\nSelect (1-3): ").strip()
+        
+        if choice == "1":
+            year = input(f"Year [{self.current_year}]: ").strip()
+            month = input(f"Month (1-12) [{self.current_month}]: ").strip()
+            year = int(year) if year.isdigit() else self.current_year
+            month = int(month) if month.isdigit() else self.current_month
+            
+            analysis = self.expense_service.get_monthly_analysis(year, month)
+            if analysis['category_breakdown']:
+                try:
+                    chart_path = self.chart_service.generate_pie_chart(
+                        analysis["category_breakdown"], month, year
+                    )
+                    print(f"✅ Chart saved to: {chart_path}")
+                except Exception as e:
+                    print(f"❌ Error generating chart: {e}")
+            else:
+                print("❌ No data for this month")
+        
+        elif choice == "2":
+            year = input(f"Year [{self.current_year}]: ").strip()
+            year = int(year) if year.isdigit() else self.current_year
+            
+            monthly_data = []
+            for m in range(1, 13):
+                expenses = self.expense_service.get_expense_history({'month': m, 'year': year})
+                total = sum(e['amount'] for e in expenses)
+                monthly_data.append({'month': m, 'total': total})
+            
+            if any(d['total'] > 0 for d in monthly_data):
+                try:
+                    chart_path = self.chart_service.generate_monthly_trend_chart(monthly_data, year)
+                    print(f"✅ Chart saved to: {chart_path}")
+                except Exception as e:
+                    print(f"❌ Error generating chart: {e}")
+            else:
+                print("❌ No data for this year")
+        
+        elif choice == "3":
+            return
+        else:
+            print("❌ Invalid selection")
+        
+        self.wait_for_enter()
+
+    # ============================================================
+    # EXPORT DATA MENU
+    # ============================================================
+
+    def export_data_menu(self):
+        """Export data menu"""
+        self.display_header("EXPORT DATA")
+        
+        print("1. Export All Expenses (CSV)")
+        print("2. Export All Expenses (Excel)")
+        print("3. Export Monthly Report")
+        print("4. Back")
+        
+        choice = input("\nSelect (1-4): ").strip()
+        
+        if choice == "1":
+            expenses = self.expense_service.get_expense_history()
+            if expenses:
+                filepath = self.export_service.export_to_csv(expenses)
+                print(f"✅ Data exported to: {filepath}")
+            else:
+                print("❌ No data to export")
+        
+        elif choice == "2":
+            expenses = self.expense_service.get_expense_history()
+            if expenses:
+                filepath = self.export_service.export_to_excel(expenses)
+                print(f"✅ Data exported to: {filepath}")
+            else:
+                print("❌ No data to export")
+        
+        elif choice == "3":
+            year = input(f"Year [{self.current_year}]: ").strip()
+            month = input(f"Month (1-12) [{self.current_month}]: ").strip()
+            year = int(year) if year.isdigit() else self.current_year
+            month = int(month) if month.isdigit() else self.current_month
+            
+            analysis = self.expense_service.get_monthly_analysis(year, month)
+            expenses = self.expense_service.get_expense_history({'month': month, 'year': year})
+            
+            if expenses:
+                filepath = self.export_service.export_monthly_report(analysis, expenses)
+                print(f"✅ Report exported to: {filepath}")
+            else:
+                print("❌ No data for this month")
+        
+        elif choice == "4":
+            return
+        else:
+            print("❌ Invalid selection")
+        
+        self.wait_for_enter()
+
+    # ============================================================
+    # BACKUP & RESTORE MENU
+    # ============================================================
+
+    def backup_restore_menu(self):
+        """Backup and restore menu"""
+        self.display_header("BACKUP & RESTORE")
+        
+        print("1. 📤 Backup Database")
+        print("2. 📥 Restore Database")
+        print("3. 📋 Export All Data (JSON)")
+        print("4. Back")
+        
+        choice = input("\nSelect (1-4): ").strip()
+        
+        if choice == "1":
+            self.backup_data()
+        elif choice == "2":
+            self.restore_data()
+        elif choice == "3":
+            self.export_all_json()
+        elif choice == "4":
+            return
+        else:
+            print("❌ Invalid selection")
+            self.wait_for_enter()
+
+    def export_all_json(self):
+        """Export all data as JSON"""
+        self.display_header("EXPORT ALL DATA (JSON)")
+        
+        try:
+            filename = f"expense_data_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
+            
+            conn = sqlite3.connect(DB_PATH)
+            cursor = conn.cursor()
+            
+            data = {
+                'expenses': [],
+                'incomes': [],
+                'budgets': [],
+                'recurring': [],
+                'tags': [],
+            }
+            
+            # Expenses
+            cursor.execute("SELECT * FROM expenses")
+            data['expenses'] = [dict(zip([col[0] for col in cursor.description], row)) for row in cursor.fetchall()]
+            
+            # Incomes
+            cursor.execute("SELECT * FROM incomes")
+            data['incomes'] = [dict(zip([col[0] for col in cursor.description], row)) for row in cursor.fetchall()]
+            
+            # Budgets
+            cursor.execute("SELECT * FROM budgets")
+            data['budgets'] = [dict(zip([col[0] for col in cursor.description], row)) for row in cursor.fetchall()]
+            
+            # Recurring
+            cursor.execute("SELECT * FROM recurring_expenses")
+            data['recurring'] = [dict(zip([col[0] for col in cursor.description], row)) for row in cursor.fetchall()]
+            
+            # Tags
+            cursor.execute("SELECT * FROM expense_tags")
+            data['tags'] = [dict(zip([col[0] for col in cursor.description], row)) for row in cursor.fetchall()]
+            
+            conn.close()
+            
+            with open(filename, 'w') as f:
+                json.dump(data, f, indent=2, default=str)
+            
+            print(f"✅ Data exported to: {filename}")
+        except Exception as e:
+            print(f"❌ Export failed: {e}")
+        
+        self.wait_for_enter()
+
+    # ============================================================
     # MAIN MENU
     # ============================================================
 
@@ -1546,78 +1778,6 @@ class ExpenseTrackerApp:
             else:
                 print("❌ Invalid selection")
                 self.wait_for_enter()
-
-    def backup_restore_menu(self):
-        """Backup and restore menu"""
-        self.display_header("BACKUP & RESTORE")
-        
-        print("1. 📤 Backup Database")
-        print("2. 📥 Restore Database")
-        print("3. 📋 Export All Data (JSON)")
-        print("4. Back")
-        
-        choice = input("\nSelect (1-4): ").strip()
-        
-        if choice == "1":
-            self.backup_data()
-        elif choice == "2":
-            self.restore_data()
-        elif choice == "3":
-            self.export_all_json()
-        elif choice == "4":
-            return
-        else:
-            print("❌ Invalid selection")
-            self.wait_for_enter()
-
-    def export_all_json(self):
-        """Export all data as JSON"""
-        self.display_header("EXPORT ALL DATA (JSON)")
-        
-        try:
-            filename = f"expense_data_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
-            
-            conn = sqlite3.connect('expense_tracker.db')
-            cursor = conn.cursor()
-            
-            data = {
-                'expenses': [],
-                'incomes': [],
-                'budgets': [],
-                'recurring': [],
-                'tags': [],
-            }
-            
-            # Expenses
-            cursor.execute("SELECT * FROM expenses")
-            data['expenses'] = [dict(zip([col[0] for col in cursor.description], row)) for row in cursor.fetchall()]
-            
-            # Incomes
-            cursor.execute("SELECT * FROM incomes")
-            data['incomes'] = [dict(zip([col[0] for col in cursor.description], row)) for row in cursor.fetchall()]
-            
-            # Budgets
-            cursor.execute("SELECT * FROM budgets")
-            data['budgets'] = [dict(zip([col[0] for col in cursor.description], row)) for row in cursor.fetchall()]
-            
-            # Recurring
-            cursor.execute("SELECT * FROM recurring_expenses")
-            data['recurring'] = [dict(zip([col[0] for col in cursor.description], row)) for row in cursor.fetchall()]
-            
-            # Tags
-            cursor.execute("SELECT * FROM expense_tags")
-            data['tags'] = [dict(zip([col[0] for col in cursor.description], row)) for row in cursor.fetchall()]
-            
-            conn.close()
-            
-            with open(filename, 'w') as f:
-                json.dump(data, f, indent=2, default=str)
-            
-            print(f"✅ Data exported to: {filename}")
-        except Exception as e:
-            print(f"❌ Export failed: {e}")
-        
-        self.wait_for_enter()
 
 
 def main():

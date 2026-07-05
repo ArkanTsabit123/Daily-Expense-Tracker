@@ -22,6 +22,9 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from services.database_service import DatabaseService
 from services.expense_service import ExpenseService
 
+# Database path constant
+DB_PATH = "data/expenses.db"
+
 # Try to import matplotlib
 try:
     import matplotlib.pyplot as plt
@@ -84,7 +87,7 @@ class ExpenseTrackerGUI:
 
     def init_additional_tables(self):
         """Initialize additional database tables"""
-        conn = sqlite3.connect('expense_tracker.db')
+        conn = sqlite3.connect(DB_PATH)
         cursor = conn.cursor()
         
         # Create expenses table FIRST if it doesn't exist
@@ -1193,7 +1196,7 @@ class ExpenseTrackerGUI:
                 return
             
             # Simpan ke database
-            conn = sqlite3.connect('expense_tracker.db')
+            conn = sqlite3.connect(DB_PATH)
             cursor = conn.cursor()
             cursor.execute(
                 """INSERT INTO incomes (date, source, amount, description, is_recurring) 
@@ -1242,7 +1245,7 @@ class ExpenseTrackerGUI:
 
     def get_total_income(self, month=None, year=None, all_time=False):
         """Get total income for period"""
-        conn = sqlite3.connect('expense_tracker.db')
+        conn = sqlite3.connect(DB_PATH)
         cursor = conn.cursor()
         
         if all_time:
@@ -1261,7 +1264,7 @@ class ExpenseTrackerGUI:
 
     def load_incomes(self):
         """Load and display incomes"""
-        conn = sqlite3.connect('expense_tracker.db')
+        conn = sqlite3.connect(DB_PATH)
         cursor = conn.cursor()
         cursor.execute("SELECT * FROM incomes ORDER BY date DESC")
         rows = cursor.fetchall()
@@ -1299,7 +1302,7 @@ class ExpenseTrackerGUI:
         if new_amount:
             try:
                 amount = float(new_amount)
-                conn = sqlite3.connect('expense_tracker.db')
+                conn = sqlite3.connect(DB_PATH)
                 cursor = conn.cursor()
                 cursor.execute("UPDATE incomes SET amount = ? WHERE id = ?", (amount, income_id))
                 conn.commit()
@@ -1323,7 +1326,7 @@ class ExpenseTrackerGUI:
         values = self.income_tree.item(selected[0])['values']
         income_id = values[0]
         
-        conn = sqlite3.connect('expense_tracker.db')
+        conn = sqlite3.connect(DB_PATH)
         cursor = conn.cursor()
         cursor.execute("DELETE FROM incomes WHERE id = ?", (income_id,))
         conn.commit()
@@ -1341,7 +1344,7 @@ class ExpenseTrackerGUI:
         """Load and display budgets"""
         self.budget_tree.delete(*self.budget_tree.get_children())
         
-        conn = sqlite3.connect('expense_tracker.db')
+        conn = sqlite3.connect(DB_PATH)
         cursor = conn.cursor()
         cursor.execute("SELECT * FROM budgets")
         rows = cursor.fetchall()
@@ -1448,7 +1451,7 @@ class ExpenseTrackerGUI:
                 messagebox.showerror("Error", "Invalid limit format!")
                 return
             
-            conn = sqlite3.connect('expense_tracker.db')
+            conn = sqlite3.connect(DB_PATH)
             cursor = conn.cursor()
             
             # Check if budget exists
@@ -1518,7 +1521,7 @@ class ExpenseTrackerGUI:
         if new_limit:
             try:
                 limit = float(new_limit)
-                conn = sqlite3.connect('expense_tracker.db')
+                conn = sqlite3.connect(DB_PATH)
                 cursor = conn.cursor()
                 cursor.execute("UPDATE budgets SET monthly_limit = ? WHERE category = ?", (limit, category))
                 conn.commit()
@@ -1541,7 +1544,7 @@ class ExpenseTrackerGUI:
         values = self.budget_tree.item(selected[0])['values']
         category = values[0]
         
-        conn = sqlite3.connect('expense_tracker.db')
+        conn = sqlite3.connect(DB_PATH)
         cursor = conn.cursor()
         cursor.execute("DELETE FROM budgets WHERE category = ?", (category,))
         conn.commit()
@@ -1649,7 +1652,7 @@ class ExpenseTrackerGUI:
                 messagebox.showerror("Error", "Invalid amount format!")
                 return
             
-            conn = sqlite3.connect('expense_tracker.db')
+            conn = sqlite3.connect(DB_PATH)
             cursor = conn.cursor()
             cursor.execute(
                 """INSERT INTO recurring_expenses 
@@ -1697,7 +1700,7 @@ class ExpenseTrackerGUI:
         """Load and display recurring expenses"""
         self.recurring_tree.delete(*self.recurring_tree.get_children())
         
-        conn = sqlite3.connect('expense_tracker.db')
+        conn = sqlite3.connect(DB_PATH)
         cursor = conn.cursor()
         cursor.execute("SELECT * FROM recurring_expenses ORDER BY id DESC")
         rows = cursor.fetchall()
@@ -1728,7 +1731,7 @@ class ExpenseTrackerGUI:
         if new_amount:
             try:
                 amount = float(new_amount)
-                conn = sqlite3.connect('expense_tracker.db')
+                conn = sqlite3.connect(DB_PATH)
                 cursor = conn.cursor()
                 cursor.execute("UPDATE recurring_expenses SET amount = ? WHERE id = ?", (amount, recurring_id))
                 conn.commit()
@@ -1751,7 +1754,7 @@ class ExpenseTrackerGUI:
         values = self.recurring_tree.item(selected[0])['values']
         recurring_id = values[0]
         
-        conn = sqlite3.connect('expense_tracker.db')
+        conn = sqlite3.connect(DB_PATH)
         cursor = conn.cursor()
         cursor.execute("DELETE FROM recurring_expenses WHERE id = ?", (recurring_id,))
         conn.commit()
@@ -1771,7 +1774,7 @@ class ExpenseTrackerGUI:
         recurring_id = values[0]
         current_active = values[7] == '✅'
         
-        conn = sqlite3.connect('expense_tracker.db')
+        conn = sqlite3.connect(DB_PATH)
         cursor = conn.cursor()
         cursor.execute("UPDATE recurring_expenses SET active = ? WHERE id = ?", (0 if current_active else 1, recurring_id))
         conn.commit()
@@ -1783,7 +1786,7 @@ class ExpenseTrackerGUI:
 
     def process_recurring_expenses(self):
         """Process all active recurring expenses"""
-        conn = sqlite3.connect('expense_tracker.db')
+        conn = sqlite3.connect(DB_PATH)
         cursor = conn.cursor()
         
         # Get all active recurring expenses
@@ -1822,7 +1825,7 @@ class ExpenseTrackerGUI:
 
     def get_expense_tags(self, expense_id):
         """Get tags for an expense"""
-        conn = sqlite3.connect('expense_tracker.db')
+        conn = sqlite3.connect(DB_PATH)
         cursor = conn.cursor()
         cursor.execute("SELECT tag FROM expense_tags WHERE expense_id = ?", (expense_id,))
         rows = cursor.fetchall()
@@ -1840,7 +1843,7 @@ class ExpenseTrackerGUI:
         if not tag:
             return
         
-        conn = sqlite3.connect('expense_tracker.db')
+        conn = sqlite3.connect(DB_PATH)
         cursor = conn.cursor()
         cursor.execute("INSERT INTO expense_tags (expense_id, tag) VALUES (?, ?)", (expense_id, tag))
         conn.commit()
@@ -1947,7 +1950,7 @@ class ExpenseTrackerGUI:
                 return
             
             # Create expense
-            conn = sqlite3.connect('expense_tracker.db')
+            conn = sqlite3.connect(DB_PATH)
             cursor = conn.cursor()
             cursor.execute(
                 """INSERT INTO expenses (date, category, amount, description, payment_method) 
@@ -2107,7 +2110,7 @@ class ExpenseTrackerGUI:
                 messagebox.showerror("Error", "Invalid amount format!")
                 return
             
-            conn = sqlite3.connect('expense_tracker.db')
+            conn = sqlite3.connect(DB_PATH)
             cursor = conn.cursor()
             
             # Update expense
@@ -2177,7 +2180,7 @@ class ExpenseTrackerGUI:
             return
         
         # Delete tags first
-        conn = sqlite3.connect('expense_tracker.db')
+        conn = sqlite3.connect(DB_PATH)
         cursor = conn.cursor()
         cursor.execute("DELETE FROM expense_tags WHERE expense_id = ?", (expense_id,))
         cursor.execute("DELETE FROM expenses WHERE id = ?", (expense_id,))
@@ -2519,13 +2522,13 @@ class ExpenseTrackerGUI:
                     df.to_excel(writer, index=False, sheet_name='Expenses')
                     
                     # Add budgets sheet
-                    conn = sqlite3.connect('expense_tracker.db')
+                    conn = sqlite3.connect(DB_PATH)
                     budgets_df = pd.read_sql_query("SELECT * FROM budgets", conn)
                     budgets_df.to_excel(writer, index=False, sheet_name='Budgets')
                     conn.close()
                     
                     # Add incomes sheet
-                    conn = sqlite3.connect('expense_tracker.db')
+                    conn = sqlite3.connect(DB_PATH)
                     incomes_df = pd.read_sql_query("SELECT * FROM incomes", conn)
                     incomes_df.to_excel(writer, index=False, sheet_name='Incomes')
                     conn.close()
@@ -2557,7 +2560,7 @@ class ExpenseTrackerGUI:
                 return
             
             count = 0
-            conn = sqlite3.connect('expense_tracker.db')
+            conn = sqlite3.connect(DB_PATH)
             cursor = conn.cursor()
             
             for _, row in df.iterrows():
@@ -2602,7 +2605,7 @@ class ExpenseTrackerGUI:
                 os.makedirs(backup_dir)
             
             backup_file = os.path.join(backup_dir, f"expense_backup_{timestamp}.db")
-            shutil.copy2("expense_tracker.db", backup_file)
+            shutil.copy2(DB_PATH, backup_file)
             
             messagebox.showinfo("Success", f"✅ Database backed up to:\n{backup_file}")
             self.status_label.config(text=f"📤 Backup created: {os.path.basename(backup_file)}")
@@ -2630,10 +2633,10 @@ class ExpenseTrackerGUI:
             # Backup current database first
             timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
             current_backup = f"backups/pre_restore_backup_{timestamp}.db"
-            shutil.copy2("expense_tracker.db", current_backup)
+            shutil.copy2(DB_PATH, current_backup)
             
             # Restore from backup
-            shutil.copy2(filename, "expense_tracker.db")
+            shutil.copy2(filename, DB_PATH)
             
             messagebox.showinfo("Success", "✅ Database restored successfully!")
             self.refresh_dashboard()
@@ -2656,7 +2659,7 @@ class ExpenseTrackerGUI:
                 return
             
             # Export all data
-            conn = sqlite3.connect('expense_tracker.db')
+            conn = sqlite3.connect(DB_PATH)
             cursor = conn.cursor()
             
             # Get all data
