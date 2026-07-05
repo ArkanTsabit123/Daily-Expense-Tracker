@@ -1,37 +1,57 @@
 # 💰 Daily Expense Tracker
 
-A comprehensive Python application for tracking daily expenses with advanced features including income tracking, budget management, recurring expenses, and data visualization.
+A Python application for tracking daily expenses with advanced features including income tracking, budget management, recurring expenses, and data visualization.
 
-## Features
+---
+
+## 📋 Table of Contents
+
+- [Features](#features)
+- [Quick Start](#quick-start)
+- [Project Structure](#project-structure)
+- [Usage](#usage)
+- [Database Schema](#database-schema)
+- [Development](#development)
+- [Dependencies](#dependencies)
+- [Future Enhancements](#future-enhancements)
+- [Contributing](#contributing)
+- [License](#license)
+- [Support](#support)
+
+---
+
+## ✨ Features
 
 ### 📊 Core Features
-- **Expense Management**: Add, view, update, delete expenses with categories
-- **Income Tracking**: Record and manage multiple income sources
-- **Budget Management**: Set monthly budgets per category with progress tracking
-- **Recurring Expenses**: Automate recurring bills and subscriptions
-- **Monthly Analysis**: Category breakdowns with percentages and trends
-- **Data Visualization**: Pie charts and trend charts for expense distribution
-- **Export Functionality**: CSV, Excel, and JSON export options
-- **Data Backup & Restore**: Local backup system with restore capability
-- **Tags & Labels**: Add custom tags to expenses for better organization
-- **Payment Methods**: Track payment methods (Cash, Credit Card, E-Wallet, etc.)
+- **Expense Management** - Add, view, update, delete expenses with categories
+- **Income Tracking** - Record and manage multiple income sources
+- **Budget Management** - Set monthly budgets per category with progress tracking
+- **Recurring Expenses** - Automate recurring bills and subscriptions
+- **Monthly Analysis** - Category breakdowns with percentages and trends
+- **Data Visualization** - Pie charts and trend charts for expense distribution
+- **Export Functionality** - CSV, Excel, and JSON export options
+- **Data Backup & Restore** - Local backup system with restore capability
+- **Tags & Labels** - Add custom tags to expenses for better organization
+- **Payment Methods** - Track payment methods (Cash, Credit Card, E-Wallet, etc.)
 
 ### 🎨 User Interfaces
-- **CLI Version**: Full-featured command-line interface with all features
-- **GUI Version**: Modern graphical interface with real-time dashboard
-- **Dashboard**: Real-time stats with total expense, income, and net balance
-- **Interactive Charts**: Pie charts and trend visualizations
+- **CLI Version** - Full-featured command-line interface
+- **GUI Version** - Modern graphical interface with real-time dashboard
+- **Interactive Charts** - Pie charts and trend visualizations
 
 ### 🛠️ Technical Features
-- **Layered Architecture**: Models-Services-Utils separation
-- **Database**: SQLite with indexing for performance
-- **Multiple Interfaces**: CLI and GUI in one application
-- **Testing**: pytest test suite
-- **Code Quality**: Black formatting, Flake8 linting
+- **Layered Architecture** - Models-Services-Utils separation
+- **Database** - SQLite with indexing for performance
+- **Multiple Interfaces** - CLI and GUI in one application
+- **Testing** - pytest test suite with coverage
+- **Code Quality** - Black formatting, Flake8 linting
 
-## Quick Start
+---
+
+## 🚀 Quick Start
 
 ### Installation
+
 ```bash
 # 1. Clone repository
 git clone https://github.com/ArkanTsabit123/Daily-Expense-Tracker.git
@@ -50,11 +70,12 @@ source venv/bin/activate
 pip install -r requirements.txt
 
 # 5. Run application
-# Choose interface:
 python run.py          # Launcher (choose CLI or GUI)
 python cli.py          # CLI version only
 python gui.py          # GUI version only
 ```
+
+---
 
 ## 📁 Project Structure
 
@@ -63,7 +84,8 @@ Daily-Expense-Tracker/
 ├── 📁 config/
 │   └── database_config.py      # Database configuration
 ├── 📁 models/
-│   └── expense_model.py        # Data models
+│   ├── expense_model.py        # Expense data model
+│   └── category_model.py       # Category data model
 ├── 📁 services/
 │   ├── database_service.py     # Database operations layer
 │   ├── expense_service.py      # Business logic layer
@@ -71,17 +93,24 @@ Daily-Expense-Tracker/
 ├── 📁 utils/
 │   ├── validation.py           # Input validation
 │   ├── date_utils.py           # Date helper functions
-│   └── formatters.py           # Data formatting
+│   ├── formatters.py           # Data formatting
+│   └── exceptions.py           # Custom exceptions
 ├── 📁 visualization/
 │   └── chart_service.py        # Chart generation
-├── 📁 backups/                 # Database backups (auto-created)
 ├── 📁 tests/                   # Test files
-├── cli.py                      # CLI application (full features)
-├── gui.py                      # GUI application (full features)
+├── 📁 backups/                 # Database backups (auto-created)
+├── 📁 exports/                 # Exported files (auto-created)
+├── 📁 charts/                  # Generated charts (auto-created)
+├── 📁 logs/                    # Application logs (auto-created)
+├── cli.py                      # CLI application
+├── gui.py                      # GUI application
 ├── run.py                      # Application launcher
+├── main.py                     # Entry point
 ├── requirements.txt            # Dependencies
 └── README.md                   # Documentation
 ```
+
+---
 
 ## 🎮 Usage
 
@@ -123,12 +152,12 @@ python gui.py
 ```
 
 **GUI Features:**
-- **Dashboard**: Real-time expense, income, and net balance stats
-- **Budget Tab**: Set and track monthly budgets with progress bars
-- **Income Tab**: Record and manage income sources
-- **Recurring Tab**: Manage recurring expenses
-- **Analytics Tab**: Advanced charts and trend analysis
-- **Settings Tab**: Backup, restore, and export options
+- **Dashboard** - Real-time expense, income, and net balance stats
+- **Budget Tab** - Set and track monthly budgets with progress bars
+- **Income Tab** - Record and manage income sources
+- **Recurring Tab** - Manage recurring expenses
+- **Analytics Tab** - Advanced charts and trend analysis
+- **Settings Tab** - Backup, restore, and export options
 
 ### Example Usage
 
@@ -153,6 +182,8 @@ python cli.py
 > Description: July salary
 > Recurring: Yes
 ```
+
+---
 
 ## 🗄️ Database Schema
 
@@ -219,9 +250,11 @@ CREATE TABLE expense_tags (
 );
 ```
 
+---
+
 ## 📊 Output Examples
 
-### CLI Screenshot
+### CLI Summary
 ```
 📊 ALL TIME SUMMARY
 ==================================================
@@ -248,21 +281,38 @@ Entertainment           Rp   500,000 (10.0%) ██
 - Search and filter functionality
 - Export buttons for CSV/Excel
 
+---
+
+## 📸 Screenshots
+
+### GUI Dashboard
+![Dashboard](screenshots/dashboard.png)
+
+### CLI Mode
+![CLI Mode](screenshots/cli-mode.png)
+
+---
+
 ## 🧪 Development
 
 ### Running Tests
+
 ```bash
 # Install test dependencies
-pip install pytest
+pip install pytest pytest-cov
 
 # Run all tests
-pytest tests/
+pytest tests/ -v
+
+# Run with coverage
+pytest tests/ --cov=. --cov-report=html
 
 # Run specific test module
 pytest tests/test_database.py -v
 ```
 
 ### Code Quality
+
 ```bash
 # Format code with Black
 black .
@@ -270,31 +320,36 @@ black .
 # Check code style with Flake8
 flake8 .
 
-# Run type checking (optional)
-mypy .
+# Sort imports with isort
+isort .
 ```
+
+---
 
 ## 📦 Dependencies
 
 ### Core Requirements
-```
-matplotlib==3.7.1        # Data visualization
-pandas==2.0.3           # Data processing and Excel export
-openpyxl==3.1.2         # Excel file manipulation
-python-dateutil==2.8.2  # Date parsing utilities
-tkinter                 # GUI framework (built-in with Python)
-```
+| Package | Version | Purpose |
+|---------|---------|---------|
+| matplotlib | 3.7.1 | Data visualization |
+| pandas | 2.0.3 | Data processing and Excel export |
+| openpyxl | 3.1.2 | Excel file manipulation |
+| python-dateutil | 2.8.2 | Date parsing utilities |
+| tkinter | Built-in | GUI framework |
 
 ### Development Dependencies
-```
-pytest==7.4.3           # Testing framework
-black==23.9.1           # Code formatting
-flake8==6.1.0           # Code linting
-```
+| Package | Version | Purpose |
+|---------|---------|---------|
+| pytest | 9.0.1 | Testing framework |
+| pytest-cov | 7.0.0 | Coverage reporting |
+| black | 24.10.0 | Code formatting |
+| flake8 | 7.1.2 | Code linting |
+| autopep8 | 2.0.0 | Auto-formatting |
 
-## Future Enhancements
+---
 
-### Planned Features
+## 🔮 Future Enhancements
+
 1. **User Authentication** - Multi-user support with login system
 2. **Cloud Sync** - Automatic backup to cloud services
 3. **Web Interface** - Flask/FastAPI web application
@@ -306,7 +361,9 @@ flake8==6.1.0           # Code linting
 9. **Dark/Light Theme** - Toggle between themes in GUI
 10. **Export Filtering** - Export specific date ranges or categories
 
-## Contributing
+---
+
+## 🤝 Contributing
 
 Contributions are welcome! Please follow these steps:
 
@@ -332,18 +389,24 @@ Contributions are welcome! Please follow these steps:
 - Use descriptive commit messages
 - Ensure your code passes all existing tests
 
-## License
+---
+
+## 📄 License
 
 This project is available for educational and personal use. Commercial use requires permission.
 
-## Acknowledgments
+---
+
+## 🙏 Acknowledgments
 
 - Built as a portfolio project to demonstrate Python development skills
 - Inspired by the need for personal finance management tools
 - Uses open-source libraries: Matplotlib, Pandas, OpenPyXL
 - SQLite for lightweight local database storage
 
-## Support
+---
+
+## 📧 Support
 
 For issues or questions:
 1. Check the existing documentation

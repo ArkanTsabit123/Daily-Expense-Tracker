@@ -12,4 +12,5 @@ pytest-mock==3.14.0
 # Development tools
 black==24.10.0
 flake8==7.1.2
-coverage==7.10.6  # Updated to be compatible with pytest-cov
+coverage==7.10.6  
+autopep8>=2.0.0
