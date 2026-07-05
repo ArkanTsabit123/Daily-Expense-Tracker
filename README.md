@@ -1,6 +1,11 @@
 # 💰 Daily Expense Tracker
 
-A Python application for tracking daily expenses with advanced features including income tracking, budget management, recurring expenses, and data visualization.
+A comprehensive Python application for tracking daily expenses with advanced features including income tracking, budget management, recurring expenses, and data visualization.
+
+![Python](https://img.shields.io/badge/Python-3.10%2B-blue)
+![SQLite](https://img.shields.io/badge/SQLite-3-green)
+![License](https://img.shields.io/badge/License-MIT-yellow)
+![Tests](https://img.shields.io/badge/Tests-277%2F277%20Passed-brightgreen)
 
 ---
 
@@ -11,6 +16,8 @@ A Python application for tracking daily expenses with advanced features includin
 - [Project Structure](#project-structure)
 - [Usage](#usage)
 - [Database Schema](#database-schema)
+- [Output Examples](#output-examples)
+- [Screenshots](#screenshots)
 - [Development](#development)
 - [Dependencies](#dependencies)
 - [Future Enhancements](#future-enhancements)
@@ -23,28 +30,34 @@ A Python application for tracking daily expenses with advanced features includin
 ## ✨ Features
 
 ### 📊 Core Features
-- **Expense Management** - Add, view, update, delete expenses with categories
-- **Income Tracking** - Record and manage multiple income sources
-- **Budget Management** - Set monthly budgets per category with progress tracking
-- **Recurring Expenses** - Automate recurring bills and subscriptions
-- **Monthly Analysis** - Category breakdowns with percentages and trends
-- **Data Visualization** - Pie charts and trend charts for expense distribution
-- **Export Functionality** - CSV, Excel, and JSON export options
-- **Data Backup & Restore** - Local backup system with restore capability
-- **Tags & Labels** - Add custom tags to expenses for better organization
-- **Payment Methods** - Track payment methods (Cash, Credit Card, E-Wallet, etc.)
+
+| Feature | Description |
+|---------|-------------|
+| **Expense Management** | Add, view, update, delete expenses with 8 categories |
+| **Income Tracking** | Record and manage multiple income sources (Salary, Bonus, Freelance, etc.) |
+| **Budget Management** | Set monthly budgets per category with progress tracking |
+| **Recurring Expenses** | Automate recurring bills and subscriptions |
+| **Monthly Analysis** | Category breakdowns with percentages and trends |
+| **Data Visualization** | Pie charts and trend charts for expense distribution |
+| **Export Functionality** | CSV, Excel, and JSON export options |
+| **Data Backup & Restore** | Local backup system with restore capability |
+| **Tags & Labels** | Add custom tags to expenses for better organization |
+| **Payment Methods** | Track payment methods (Cash, Credit Card, E-Wallet, etc.) |
 
 ### 🎨 User Interfaces
-- **CLI Version** - Full-featured command-line interface
-- **GUI Version** - Modern graphical interface with real-time dashboard
+
+- **CLI Version** - Full-featured command-line interface with 12 menu options
+- **GUI Version** - Modern dark-themed graphical interface with 6 tabs
 - **Interactive Charts** - Pie charts and trend visualizations
+- **Real-time Dashboard** - Live stats with Total Expense, Income, and Net Balance
 
 ### 🛠️ Technical Features
+
 - **Layered Architecture** - Models-Services-Utils separation
-- **Database** - SQLite with indexing for performance
+- **Database** - SQLite with 5 optimized indexes for performance
 - **Multiple Interfaces** - CLI and GUI in one application
-- **Testing** - pytest test suite with coverage
-- **Code Quality** - Black formatting, Flake8 linting
+- **Testing** - 277 test cases with 100% pass rate
+- **Code Quality** - Black formatting, Flake8 linting, 100% coverage
 
 ---
 
@@ -75,6 +88,16 @@ python cli.py          # CLI version only
 python gui.py          # GUI version only
 ```
 
+### Generate Sample Data (Optional)
+
+```bash
+# Generate 100 dummy expenses with sample data
+python utils/dummy_data.py --preview
+
+# Generate 200 expenses, 6 months back
+python utils/dummy_data.py -n 200 -m 6 --preview
+```
+
 ---
 
 ## 📁 Project Structure
@@ -82,32 +105,37 @@ python gui.py          # GUI version only
 ```
 Daily-Expense-Tracker/
 ├── 📁 config/
-│   └── database_config.py      # Database configuration
+│   └── database_config.py          # Database configuration
 ├── 📁 models/
-│   ├── expense_model.py        # Expense data model
-│   └── category_model.py       # Category data model
+│   ├── expense_model.py            # Expense data model
+│   └── category_model.py           # Category data model
 ├── 📁 services/
-│   ├── database_service.py     # Database operations layer
-│   ├── expense_service.py      # Business logic layer
-│   └── export_service.py       # Export functionality
+│   ├── database_service.py         # Database operations layer
+│   ├── expense_service.py          # Business logic layer
+│   └── export_service.py           # Export functionality
 ├── 📁 utils/
-│   ├── validation.py           # Input validation
-│   ├── date_utils.py           # Date helper functions
-│   ├── formatters.py           # Data formatting
-│   └── exceptions.py           # Custom exceptions
+│   ├── validation.py               # Input validation
+│   ├── date_utils.py               # Date helper functions
+│   ├── formatters.py               # Data formatting
+│   ├── exceptions.py               # Custom exceptions
+│   └── dummy_data.py               # Sample data generator
 ├── 📁 visualization/
-│   └── chart_service.py        # Chart generation
-├── 📁 tests/                   # Test files
-├── 📁 backups/                 # Database backups (auto-created)
-├── 📁 exports/                 # Exported files (auto-created)
-├── 📁 charts/                  # Generated charts (auto-created)
-├── 📁 logs/                    # Application logs (auto-created)
-├── cli.py                      # CLI application
-├── gui.py                      # GUI application
-├── run.py                      # Application launcher
-├── main.py                     # Entry point
-├── requirements.txt            # Dependencies
-└── README.md                   # Documentation
+│   └── chart_service.py            # Chart generation
+├── 📁 tests/                       # Test files (6 test modules)
+├── 📁 backups/                     # Database backups (auto-created)
+├── 📁 exports/                     # Exported files (auto-created)
+├── 📁 charts/                      # Generated charts (auto-created)
+├── 📁 logs/                        # Application logs (auto-created)
+├── 📁 data/                        # Database storage
+│   └── expenses.db                 # SQLite database
+├── cli.py                          # CLI application (66KB)
+├── gui.py                          # GUI application (103KB)
+├── run.py                          # Application launcher
+├── main.py                         # Entry point
+├── requirements.txt                # Dependencies
+├── check_db.py                     # Database inspection tool
+├── reset_db.py                     # Database reset tool
+└── README.md                       # Documentation
 ```
 
 ---
@@ -125,8 +153,8 @@ python cli.py
 ```
 📊 EXPENSE TRACKING
 1. ➕ Add Expense
-2. 📜 View History
-3. 📊 Summary
+2. 📜 View History (with filters)
+3. 📊 Summary (All Time / Monthly / Yearly)
 4. 📈 Generate Chart
 
 💰 FINANCE MANAGEMENT
@@ -187,9 +215,11 @@ python cli.py
 
 ## 🗄️ Database Schema
 
-The application uses SQLite with the following tables:
+The application uses SQLite with the following tables and indexes:
 
-### Expenses Table
+### Tables
+
+**Expenses Table:**
 ```sql
 CREATE TABLE expenses (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -202,7 +232,7 @@ CREATE TABLE expenses (
 );
 ```
 
-### Incomes Table
+**Incomes Table:**
 ```sql
 CREATE TABLE incomes (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -215,7 +245,7 @@ CREATE TABLE incomes (
 );
 ```
 
-### Budgets Table
+**Budgets Table:**
 ```sql
 CREATE TABLE budgets (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -225,7 +255,7 @@ CREATE TABLE budgets (
 );
 ```
 
-### Recurring Expenses Table
+**Recurring Expenses Table:**
 ```sql
 CREATE TABLE recurring_expenses (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -240,7 +270,7 @@ CREATE TABLE recurring_expenses (
 );
 ```
 
-### Tags Table
+**Expense Tags Table:**
 ```sql
 CREATE TABLE expense_tags (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -250,46 +280,111 @@ CREATE TABLE expense_tags (
 );
 ```
 
+### Database Indexes
+
+```sql
+-- Optimized queries for performance
+CREATE INDEX idx_expenses_date ON expenses(date);
+CREATE INDEX idx_expenses_category ON expenses(category);
+CREATE INDEX idx_expenses_date_category ON expenses(date, category);
+```
+
 ---
 
 ## 📊 Output Examples
 
-### CLI Summary
+### CLI - All Time Summary (Real Data)
+
 ```
 📊 ALL TIME SUMMARY
 ==================================================
-Total Expense  : Rp 5,000,000
-Total Income   : Rp 8,000,000
-Net Balance    : Rp 3,000,000
-Transactions   : 45
-Categories     : 6
-Period         : 2026-01-01 to 2026-07-02
+Total Expense  : Rp 18,262,000
+Total Income   : Rp 32,990,000
+Net Balance    : Rp 14,728,000
+Transactions   : 100
+Categories     : 8
+Period         : 2026-04-01 to 2026-07-06
 ==================================================
 
 📂 Category Breakdown:
 --------------------------------------------------
-Food                    Rp 2,000,000 (40.0%) ████████
-Transport               Rp 1,000,000 (20.0%) ████
-Bills                   Rp 1,500,000 (30.0%) ██████
-Entertainment           Rp   500,000 (10.0%) ██
+Education               Rp  5,349,000 (29.3%) ████████████████
+Bills                   Rp  3,911,000 (21.4%) ███████████
+Shopping                Rp  2,848,000 (15.6%) ████████
+Food                    Rp  1,624,000 (8.9%)  █████
+Health                  Rp  2,509,000 (8.9%)  █████
+Entertainment           Rp  1,089,000 (6.0%)  ███
+Other                   Rp    586,000 (3.2%)   ██
+Transport               Rp    346,000 (1.9%)   █
 ```
 
-### GUI Features
-- Real-time dashboard with stats cards
-- Interactive pie charts
-- Budget progress bars with color indicators
-- Search and filter functionality
-- Export buttons for CSV/Excel
+### CLI - Budget Overview
+
+```
+📊 BUDGET OVERVIEW
+==================================================
+Period: July 2026
+
+📂 Bills
+   Limit : Rp 3,000,000
+   Spent : Rp 1,200,000
+   Left  : Rp 1,800,000
+   [████████░░░░░░░░░░░░░░] 40.0%  🟢 ON TRACK
+
+📂 Food
+   Limit : Rp 2,000,000
+   Spent : Rp 800,000
+   Left  : Rp 1,200,000
+   [████░░░░░░░░░░░░░░░░░░] 40.0%  🟢 ON TRACK
+```
+
+### GUI Dashboard (Real Data)
+
+```
+💰 Expense Dashboard
+======================================================================
+Total Expense  : Rp 18,262,000
+Total Income   : Rp 32,990,000
+Net Balance    : Rp 14,728,000
+Categories     : 8
+Avg/Day        : Rp 50,000
+Top Category   : Education (Rp 5,349,000)
+Transactions   : 100
+```
 
 ---
 
 ## 📸 Screenshots
 
-### GUI Dashboard
-![Dashboard](screenshots/dashboard.png)
+### 🖥️ GUI Interface
 
-### CLI Mode
-![CLI Mode](screenshots/cli-mode.png)
+| Dashboard | Budget Management |
+|-----------|-------------------|
+| ![Dashboard](screenshots/gui-dashboard.png) | ![Budget](screenshots/gui-budget.png) |
+
+| Income Tracking | Recurring Expenses |
+|-----------------|-------------------|
+| ![Income](screenshots/gui-income.png) | ![Recurring](screenshots/gui-recurring.png) |
+
+| Analytics | Settings |
+|-----------|----------|
+| ![Analytics](screenshots/gui-analytics.png) | ![Settings](screenshots/gui-settings.png) |
+
+### 💻 CLI Interface
+
+| Main Menu | View History |
+|-----------|--------------|
+| ![CLI Main](screenshots/cli-main.png) | ![CLI History](screenshots/cli-history.png) |
+
+| All Time Summary | Generate Chart |
+|------------------|----------------|
+| ![CLI Summary](screenshots/cli-summary.png) | ![CLI Chart](screenshots/cli-chart.png) |
+
+### 📊 Export & Testing
+
+| Export Files | Test Results |
+|--------------|--------------|
+| ![Export](screenshots/export-files.png) | ![Tests](screenshots/test-results.png) |
 
 ---
 
@@ -298,17 +393,32 @@ Entertainment           Rp   500,000 (10.0%) ██
 ### Running Tests
 
 ```bash
-# Install test dependencies
-pip install pytest pytest-cov
-
-# Run all tests
-pytest tests/ -v
-
-# Run with coverage
-pytest tests/ --cov=. --cov-report=html
+# Run all tests with coverage
+pytest tests/ -v --cov=. --cov-report=html
 
 # Run specific test module
 pytest tests/test_database.py -v
+pytest tests/test_expenses.py -v
+pytest tests/test_export.py -v
+
+# Run all verification phases
+python phase-all-summary.py --phase=all
+```
+
+### Utility Scripts
+
+```bash
+# Check database structure and data
+python check_db.py
+
+# Reset database (delete all data)
+python reset_db.py
+
+# Generate dummy test data
+python utils/dummy_data.py --preview
+
+# Add manual income entries
+python add_income.py
 ```
 
 ### Code Quality
@@ -329,6 +439,7 @@ isort .
 ## 📦 Dependencies
 
 ### Core Requirements
+
 | Package | Version | Purpose |
 |---------|---------|---------|
 | matplotlib | 3.7.1 | Data visualization |
@@ -338,6 +449,7 @@ isort .
 | tkinter | Built-in | GUI framework |
 
 ### Development Dependencies
+
 | Package | Version | Purpose |
 |---------|---------|---------|
 | pytest | 9.0.1 | Testing framework |
@@ -383,6 +495,7 @@ Contributions are welcome! Please follow these steps:
 5. **Open a Pull Request**
 
 ### Development Guidelines
+
 - Follow PEP 8 style guidelines
 - Add tests for new functionality
 - Update documentation accordingly
