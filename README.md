@@ -131,7 +131,6 @@ Daily-Expense-Tracker/
 ├── cli.py                          # CLI application (66KB)
 ├── gui.py                          # GUI application (103KB)
 ├── run.py                          # Application launcher
-├── main.py                         # Entry point
 ├── requirements.txt                # Dependencies
 ├── check_db.py                     # Database inspection tool
 ├── reset_db.py                     # Database reset tool
@@ -329,13 +328,13 @@ Period: July 2026
    Limit : Rp 3,000,000
    Spent : Rp 1,200,000
    Left  : Rp 1,800,000
-   [████████░░░░░░░░░░░░░░] 40.0%  🟢 ON TRACK
+   40.0%  🟢 ON TRACK
 
 📂 Food
    Limit : Rp 2,000,000
    Spent : Rp 800,000
    Left  : Rp 1,200,000
-   [████░░░░░░░░░░░░░░░░░░] 40.0%  🟢 ON TRACK
+    40.0%  🟢 ON TRACK
 ```
 
 ### GUI Dashboard (Real Data)
